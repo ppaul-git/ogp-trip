@@ -172,8 +172,8 @@ dialog.gal { width: min(1100px, calc(100vw - 24px)); }
 .dhead h2 { font-family: var(--f-display); font-weight: 700; font-size: clamp(24px, 5vw, 32px); line-height: 1.1; margin: 4px 0 2px; text-wrap: balance; }
 .dhead .tplace a { color: var(--accent); font-weight: 600; text-decoration: none; white-space: nowrap; }
 .dhead .tplace a:hover { text-decoration: underline; }
-.spec { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 150px), 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
-.spec div { background: var(--surface); padding: 10px 12px; display: grid; gap: 2px; min-width: 0; }
+.spec { display: flex; flex-wrap: wrap; gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+.spec div { flex: 1 1 140px; background: var(--surface); padding: 10px 12px; display: grid; gap: 2px; min-width: 0; }
 .spec dt { font-size: 12px; color: var(--muted); }
 .spec dd { margin: 0; font-weight: 600; font-size: 16px; }
 .spec dd small { font-weight: 400; color: var(--muted); font-size: 12px; }
@@ -361,7 +361,7 @@ const HOUSES = [
     points: ["Le plus proche de Bordeaux", "Piscine extérieure et jacuzzi intérieur"],
     paul: "5 chambres par contre.", photos: ["img/gite-01.jpg", "img/gite-02.jpg", "img/gite-03.jpg", "img/gite-04.jpg", "img/gite-05.jpg", "img/gite-06.jpg", "img/gite-07.jpg", "img/gite-08.jpg", "img/gite-09.jpg", "img/gite-10.jpg", "img/gite-11.jpg", "img/gite-12.jpg", "img/gite-13.jpg", "img/gite-14.jpg", "img/gite-15.jpg", "img/gite-16.jpg", "img/gite-17.jpg", "img/gite-18.jpg", "img/gite-19.jpg", "img/gite-20.jpg", "img/gite-21.jpg", "img/gite-22.jpg", "img/gite-23.jpg", "img/gite-24.jpg", "img/gite-25.jpg", "img/gite-26.jpg", "img/gite-27.jpg"] },
   { id: "manoir2", tag: "Manoir 2", name: "Le domaine de La Chapelle-sur-Dun", place: "Près de Dieppe · Seine-Maritime", kind: "Maison de vacances · Proposé par Paul",
-    price: 1108, cap: 14, rooms: 7, size: "300 m²", paris: "2h30", bordeaux: "7h", lat: 49.86, lon: 0.86, lab: "r", ldy: 5,
+    price: 1108, bath: 6, cap: 14, rooms: 7, size: "300 m²", paris: "2h30", bordeaux: "7h", lat: 49.86, lon: 0.86, lab: "r", ldy: 5,
     url: "https://www.gites.fr/d/61682276",
     points: ["Court de tennis privé, 6 salles de bain", "À quelques minutes des plages et de Veules-les-Roses"],
     paul: "Pas cher du tout. 7h depuis Bordeaux par contre : plutôt le train jusqu'à Paris et on vous récupère en voiture ?", photos: ["img/manoir2-01.jpg", "img/manoir2-02.jpg", "img/manoir2-03.jpg", "img/manoir2-04.jpg", "img/manoir2-05.jpg", "img/manoir2-06.jpg", "img/manoir2-07.jpg", "img/manoir2-08.jpg", "img/manoir2-09.jpg", "img/manoir2-10.jpg", "img/manoir2-11.jpg", "img/manoir2-12.jpg", "img/manoir2-13.jpg", "img/manoir2-14.jpg", "img/manoir2-15.jpg", "img/manoir2-16.jpg", "img/manoir2-17.jpg", "img/manoir2-18.jpg", "img/manoir2-19.jpg", "img/manoir2-20.jpg", "img/manoir2-21.jpg", "img/manoir2-22.jpg", "img/manoir2-23.jpg", "img/manoir2-24.jpg", "img/manoir2-25.jpg", "img/manoir2-26.jpg", "img/manoir2-27.jpg", "img/manoir2-28.jpg", "img/manoir2-29.jpg", "img/manoir2-30.jpg", "img/manoir2-31.jpg", "img/manoir2-32.jpg", "img/manoir2-33.jpg", "img/manoir2-34.jpg", "img/manoir2-35.jpg"] },
@@ -407,7 +407,7 @@ function fromDoc(d) {
     id: "p-" + d.id, docId: d.id, added: true, by: String(x.by || "").slice(0, 40), voter: x.voter || null, at: x.at || "",
     tag: (typeof x.tag === "string" && x.tag.trim()) ? x.tag.trim().slice(0, 24) : "Nouveau lieu", name: nm, pending: !x.filled,
     place: (typeof x.town === "string" && x.town.trim()) ? x.town.trim().slice(0, 70) : host(url), kind: "Proposé par " + (String(x.by || "le groupe").slice(0, 40)),
-    price: num(x.price) || 0, cap: num(x.cap), rooms: num(x.rooms), size: null,
+    price: num(x.price) || 0, cap: num(x.cap), rooms: num(x.rooms), bath: (Number(x.bath) > 0 && Number(x.bath) < 20) ? Number(x.bath) : null, size: null,
     paris: String(x.paris || "").slice(0, 12) || "?", bordeaux: String(x.bordeaux || "").slice(0, 12) || "?",
     lat: okPos ? lat : null, lon: okPos ? lon : null, lab: "r", ldy: 5, url, points: pts, paul: null, photos,
   };
@@ -635,6 +635,7 @@ function openHouse(id) {
   if (h.price) { spec.push(["Prix total", eur(h.price), h.priceNote], ["Par personne", eur(Math.round(h.price / GROUP)), "pour " + GROUP]); }
   if (h.cap) spec.push(["Capacité", h.cap + " pers."]);
   if (h.rooms) spec.push(["Chambres", String(h.rooms)]);
+  if (h.bath) spec.push(["Salles de bain", String(h.bath).replace(".", ",")]);
   if (h.size) spec.push(["Surface", h.size]);
   if (h.paris !== "?") spec.push(["Depuis Paris", h.paris]);
   if (h.bordeaux !== "?") spec.push(["Depuis Bordeaux", h.bordeaux]);
