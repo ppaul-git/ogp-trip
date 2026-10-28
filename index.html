@@ -94,6 +94,8 @@ h1 .dot { color: var(--colza); }
 .map { width: 100%; max-width: 100%; height: auto; display: block; overflow: hidden; }
 .map .land { fill: var(--bg); stroke: var(--muted); stroke-linejoin: round; }
 .map .city circle { fill: var(--surface); stroke: var(--muted); }
+.map .ref circle { fill: var(--surface); stroke: var(--muted); }
+.map .ref text { fill: var(--muted); font-family: var(--f-body); font-weight: 400; opacity: .85; }
 .map .city text { fill: var(--muted); font-family: var(--f-body); font-weight: 500; }
 .map .pin { cursor: pointer; }
 .map .pin circle.dot { fill: var(--accent); stroke: var(--surface); }
@@ -540,6 +542,18 @@ function renderMap() {
     return { sx, sy, lx, ly, near };
   }).sort((a, b) => a.near - b.near)[0];
   const fixed = [[px, py, 6 * k], [sides.lx, sides.ly, 20 * k]];
+  /* reference cities (only those inside the view), label on the side away from the pins */
+  const refs = [["Rouen", 49.443, 1.099], ["Orléans", 47.902, 1.909], ["Reims", 49.258, 4.032], ["Amiens", 49.894, 2.296], ["Le Mans", 48.006, 0.199], ["Caen", 49.183, -0.371]]
+    .map(([name, la, lo]) => { const [x, y] = proj(la, lo); return { name, x, y }; })
+    .filter(c => c.x > vb[0] + 8 * k && c.x < vb[0] + vb[2] - 50 * k && c.y > vb[1] + 12 * k && c.y < vb[1] + vb[3] - 24 * k);
+  const refG = el("g", { class: "ref" });
+  for (const c of refs) {
+    const w = c.name.length * 6.2 * k;
+    const opts = [1, -1].map(sx => { const lx = c.x + sx * (8 * k + w / 2); return { sx, lx, near: pts.reduce((a, [x, y]) => a + Math.max(0, 40 * k - Math.hypot(x - lx, y - c.y)), 0) }; }).sort((a, b) => a.near - b.near)[0];
+    fixed.push([c.x, c.y, 4 * k], [opts.lx, c.y, w / 2 + 2 * k]);
+    refG.append(el("circle", { cx: c.x, cy: c.y, r: 2.6 * k, "stroke-width": 1.5 * k }), el("text", { x: c.x + opts.sx * 7 * k, y: c.y + 4 * k, "text-anchor": opts.sx === 1 ? "start" : "end", style: `font-size:${11.5 * k}px` }, c.name));
+  }
+  m.append(refG);
   const shown = spread(pts, r, fixed);
   const city = el("g", { class: "city" });
   city.append(el("circle", { cx: px, cy: py, r: 4 * k, "stroke-width": 2 * k }));
