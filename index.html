@@ -91,7 +91,7 @@ h1 .dot { color: var(--colza); }
 .mapsec h2 { font-family: var(--f-display); font-size: 22px; margin: 0; }
 .mapwrap { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 20px; align-items: start; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 16px; }
 @media (max-width: 700px) { .mapwrap { grid-template-columns: 1fr; } }
-.map { width: 100%; max-width: 100%; height: auto; display: block; }
+.map { width: 100%; max-width: 100%; height: auto; display: block; overflow: hidden; }
 .map .land { fill: var(--bg); stroke: var(--muted); stroke-linejoin: round; }
 .map .city circle { fill: var(--surface); stroke: var(--muted); }
 .map .city text { fill: var(--muted); font-family: var(--f-body); font-weight: 500; }
@@ -474,41 +474,54 @@ function renderGrid() {
 
 /* ---------- map ---------- */
 function el(tag, attrs = {}, text) { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (text != null) e.textContent = text; return e; }
-function baseMap(target, vb = [0, 0, MAP_W, MAP_H]) {
-  const k = vb[2] / 420;
+function baseMap(target, vb = [0, 0, MAP_W, MAP_H], withCities = true) {
+  const px = target.getBoundingClientRect().width;
+  const k = vb[2] / (px > 100 ? Math.min(px, 640) : 420);
   target.setAttribute("viewBox", vb.map(v => Math.round(v * 10) / 10).join(" "));
   target.replaceChildren(el("path", { class: "land", d: FRANCE, "stroke-width": 1.2 * k }));
-  for (const [name, lat, lon] of CITIES) {
+  if (withCities) for (const [name, lat, lon] of CITIES) {
     const [x, y] = proj(lat, lon); const g = el("g", { class: "city" });
     g.append(el("circle", { cx: x, cy: y, r: 4 * k, "stroke-width": 2 * k }), el("text", { x: x + 9 * k, y: y + 4.5 * k, style: `font-size:${13 * k}px` }, name));
     target.append(g);
   }
   return k;
 }
-/* fit the view around the pins plus Paris and Bordeaux, then push overlapping pins apart */
+/* zoom on the pins + Paris (Bordeaux becomes an arrow at the edge), then separate pins that would touch */
 function fitView(pts) {
-  const all = [...pts, ...CITIES.map(([, la, lo]) => proj(la, lo))];
+  const all = [...pts, proj(48.857, 2.352)];
   let x0 = Math.min(...all.map(p => p[0])), x1 = Math.max(...all.map(p => p[0]));
   let y0 = Math.min(...all.map(p => p[1])), y1 = Math.max(...all.map(p => p[1]));
-  const pad = 34; x0 -= pad; y0 -= pad; x1 += pad + 40; y1 += pad;
   let w = x1 - x0, h = y1 - y0;
-  if (w < 240) { x0 -= (240 - w) / 2; w = 240; }
-  if (h < 240) { y0 -= (240 - h) / 2; h = 240; }
+  const padX = Math.max(w * 0.12, 18), padY = Math.max(h * 0.14, 18);
+  x0 -= padX; x1 += padX; y0 -= padY; y1 += padY + 10; w = x1 - x0; h = y1 - y0;
+  const minW = 150; if (w < minW) { x0 -= (minW - w) / 2; w = minW; }
+  if (h < w * 0.75) { y0 -= (w * 0.75 - h) / 2; h = w * 0.75; }
+  if (w < h * 0.9) { x0 -= (h * 0.9 - w) / 2; w = h * 0.9; }
   return [x0, y0, w, h];
 }
-function spread(pts, r) {
-  const q = pts.map(p => [p[0], p[1]]), min = 2 * r + r * 0.35;
-  for (let it = 0; it < 120; it++) {
+function spread(pts, r, fixed = []) {
+  const q = pts.map(p => [p[0], p[1]]), min = 2 * r + r * 0.45;
+  for (let it = 0; it < 400; it++) {
     let moved = false;
-    for (let i = 0; i < q.length; i++) for (let j = i + 1; j < q.length; j++) {
-      let dx = q[j][0] - q[i][0], dy = q[j][1] - q[i][1], d = Math.hypot(dx, dy);
-      if (d >= min) continue;
-      if (d < 0.01) { dx = 0; dy = 1; d = 1; }
-      const push = (min - d) / 2;
-      q[i][0] -= dx / d * push; q[i][1] -= dy / d * push;
-      q[j][0] += dx / d * push; q[j][1] += dy / d * push; moved = true;
+    for (let i = 0; i < q.length; i++) {
+      for (let j = i + 1; j < q.length; j++) {
+        let dx = q[j][0] - q[i][0], dy = q[j][1] - q[i][1], d = Math.hypot(dx, dy);
+        if (d >= min) continue;
+        if (d < 0.01) { dx = Math.cos(i + j); dy = Math.sin(i + j); d = 1; }
+        const push = (min - d) / 2 + 0.01;
+        q[i][0] -= dx / d * push; q[i][1] -= dy / d * push;
+        q[j][0] += dx / d * push; q[j][1] += dy / d * push; moved = true;
+      }
+      for (const [fx, fy, fr] of fixed) {
+        let dx = q[i][0] - fx, dy = q[i][1] - fy, d = Math.hypot(dx, dy), m2 = r + fr;
+        if (d >= m2) continue;
+        if (d < 0.01) { dx = 0; dy = -1; d = 1; }
+        q[i][0] += dx / d * (m2 - d); q[i][1] += dy / d * (m2 - d); moved = true;
+      }
+      /* gently pull back toward the true spot so pins don't drift far */
+      q[i][0] += (pts[i][0] - q[i][0]) * 0.02; q[i][1] += (pts[i][1] - q[i][1]) * 0.02;
     }
-    if (!moved) break;
+    if (!moved && it > 40) break;
   }
   return q;
 }
@@ -516,17 +529,52 @@ function renderMap() {
   const m = $("map"), list = places();
   const located = list.map((h, i) => ({ h, i })).filter(o => o.h.lat != null);
   const pts = located.map(o => proj(o.h.lat, o.h.lon));
-  const k = baseMap(m);
-  const r = 9 * k, shown = spread(pts, r);
+  const vb = fitView(pts);
+  const k = baseMap(m, vb, false);
+  const r = 12 * k;
+  /* Paris: dot + label placed on the side with the fewest pins */
+  const [px, py] = proj(48.857, 2.352);
+  const sides = [[1, 0], [-1, 0], [0, 1], [0, -1]].map(([sx, sy]) => {
+    const lx = px + sx * 30 * k, ly = py + sy * 18 * k;
+    const near = pts.reduce((a, [x, y]) => a + Math.max(0, 60 * k - Math.hypot(x - lx, y - ly)), 0);
+    return { sx, sy, lx, ly, near };
+  }).sort((a, b) => a.near - b.near)[0];
+  const fixed = [[px, py, 6 * k], [sides.lx, sides.ly, 20 * k]];
+  const shown = spread(pts, r, fixed);
+  const city = el("g", { class: "city" });
+  city.append(el("circle", { cx: px, cy: py, r: 4 * k, "stroke-width": 2 * k }));
+  const anchor = sides.sx === 1 ? "start" : sides.sx === -1 ? "end" : "middle";
+  const tx = px + sides.sx * 9 * k, ty = py + (sides.sy === 1 ? 17 * k : sides.sy === -1 ? -9 * k : 4.5 * k);
+  city.append(el("text", { x: tx, y: ty, "text-anchor": anchor, style: `font-size:${13 * k}px` }, "Paris"));
+  /* Bordeaux: arrow at the bottom edge pointing toward it */
+  const [bx, by] = proj(44.84, -0.58);
+  const inView = bx > vb[0] && bx < vb[0] + vb[2] && by > vb[1] && by < vb[1] + vb[3];
+  const bord = el("g", { class: "city" });
+  if (inView) {
+    bord.append(el("circle", { cx: bx, cy: by, r: 4 * k, "stroke-width": 2 * k }), el("text", { x: bx + 9 * k, y: by + 4.5 * k, style: `font-size:${13 * k}px` }, "Bordeaux"));
+  } else {
+    const cx = vb[0] + vb[2] / 2, cy = vb[1] + vb[3] / 2, ang = Math.atan2(by - cy, bx - cx);
+    const ex = Math.min(Math.max(cx + Math.cos(ang) * vb[2], vb[0] + 70 * k), vb[0] + vb[2] - 20 * k);
+    const ey = vb[1] + vb[3] - 14 * k;
+    const a = 7 * k;
+    bord.append(el("path", { d: `M${ex - a} ${ey - a}L${ex} ${ey}L${ex + a} ${ey - a}M${ex} ${ey}L${ex} ${ey - 2.4 * a}`, fill: "none", stroke: "var(--muted)", "stroke-width": 2 * k, "stroke-linecap": "round" }));
+    bord.append(el("text", { x: ex - 11 * k, y: ey - 2 * k, "text-anchor": "end", style: `font-size:${13 * k}px` }, "Bordeaux"));
+  }
+  m.append(bord);
   located.forEach((o, n) => {
-    const [x0, y0] = pts[n], [x, y] = shown[n], h = o.h;
-    if (Math.hypot(x - x0, y - y0) > r * 0.4) {
+    const [x0, y0] = pts[n], [x, y] = shown[n];
+    if (Math.hypot(x - x0, y - y0) > r * 0.5) {
       m.append(el("line", { x1: x0, y1: y0, x2: x, y2: y, stroke: "var(--accent)", "stroke-width": 1.5 * k }));
-      m.append(el("circle", { cx: x0, cy: y0, r: 3 * k, fill: "var(--accent)" }));
+      m.append(el("circle", { cx: x0, cy: y0, r: 2.6 * k, fill: "var(--accent)" }));
     }
+  });
+  m.append(city);
+  located.forEach((o, n) => {
+    const [x, y] = shown[n], h = o.h;
     const g = el("g", { class: "pin", tabindex: "0", role: "button", "aria-label": `${h.tag}. ${h.name}` });
     g.append(el("title", {}, `${h.tag}. ${h.name}`));
-    g.append(el("circle", { class: "dot", cx: x, cy: y, r, "stroke-width": 2.5 * k }), el("text", { class: "n", x, y: y + 4.5 * k, "text-anchor": "middle", style: `font-size:${13 * k}px` }, h.tag));
+    const fs = (h.tag.length > 1 ? 11.5 : 13) * k;
+    g.append(el("circle", { class: "dot", cx: x, cy: y, r, "stroke-width": 2.5 * k }), el("text", { class: "n", x, y: y + fs * 0.36, "text-anchor": "middle", style: `font-size:${fs}px` }, h.tag));
     g.addEventListener("click", () => openHouse(h.id));
     g.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); openHouse(h.id); } });
     m.append(g);
@@ -813,6 +861,7 @@ function route() {
   if (byId(id)) openHouse(id); else if (!id && $("dlg").open) closeHouse();
 }
 window.addEventListener("hashchange", route);
+let mapW = 0; window.addEventListener("resize", () => { const w = $("map").getBoundingClientRect().width; if (Math.abs(w - mapW) > 40) { mapW = w; renderMap(); } });
 
 renderGrid();
 route();
