@@ -1,0 +1,888 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="description" content="Les logements pour le week-end du 15 au 18 avril : photos, prix, votes et commentaires.">
+<meta property="og:title" content="OGP Trip 15 avril · On dort où ?">
+<meta property="og:description" content="Les logements pour le week-end : photos, prix, votes et commentaires.">
+<meta property="og:image" content="https://ppaul-git.github.io/ogp-trip/img/ardennes-01.jpg">
+<meta property="og:type" content="website">
+<meta name="robots" content="noindex">
+<style>:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}*,*::before,*::after{box-sizing:inherit}body{margin:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>OGP Trip 15 avril</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Layout: 2x2 gallery of house tiles (photo + footer with votes), each opens a detail sheet with facts, votes and comments. */
+:root {
+  --bg: #F4F3EC;
+  --surface: #FFFFFF;
+  --fg: #1E2A1F;
+  --muted: #646D5E;
+  --line: #E2E1D4;
+  --accent: #2F5D3A;
+  --accent-fg: #FFFFFF;
+  --accent-soft: #E3EDE2;
+  --colza: #F2C81F;
+  --colza-fg: #3A2E00;
+  --up: #2E7A4C;  --up-soft: #DFF0E4;
+  --down: #B2442E; --down-soft: #F8E2DC;
+  --shade: rgb(20 30 20 / .10);
+  --scrim: rgb(15 22 15 / .55);
+  --f-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+  color-scheme: light;
+}
+
+body { background: var(--bg); color: var(--fg); font-family: var(--f-body); font-size: 15px; line-height: 1.5; }
+.wrap { max-width: 1040px; margin: 0 auto; padding-block: 36px 64px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: grid; gap: 22px; }
+.num { font-family: var(--f-mono); font-variant-numeric: tabular-nums; }
+
+header { display: grid; gap: 6px; }
+.eyebrow { font-family: var(--f-mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+h1 { font-family: var(--f-display); font-weight: 700; font-size: clamp(32px, 7vw, 52px); line-height: 1.02; margin: 0; letter-spacing: -.015em; text-wrap: balance; }
+h1 .dot { color: var(--colza); }
+.sub { color: var(--muted); margin: 4px 0 0; max-width: 62ch; }
+
+.stats { display: flex; flex-wrap: wrap; gap: 8px; }
+.stat { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 5px 12px; font-size: 13px; color: var(--muted); }
+.stat b { color: var(--fg); font-weight: 600; }
+
+.notice { border: 1px dashed var(--line); border-radius: 12px; padding: 12px 14px; color: var(--muted); font-size: 14px; background: var(--surface); }
+
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 230px), 1fr)); gap: 16px; }
+.tile { position: relative; display: flex; flex-direction: column; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; cursor: pointer; text-align: left; padding: 0; font: inherit; color: inherit; transition: border-color .15s, box-shadow .15s, transform .15s; }
+.tile:hover { border-color: var(--muted); box-shadow: 0 8px 24px var(--shade); }
+.tile:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.photo { position: relative; aspect-ratio: 3 / 2; max-width: 100%; background: var(--line); overflow: hidden; }
+.photo img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .4s; }
+.tile:hover .photo img { transform: scale(1.03); }
+.tag { position: absolute; top: 10px; left: 10px; max-width: calc(100% - 20px); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: var(--f-mono); font-size: 10px; font-weight: 500; letter-spacing: .06em; text-transform: uppercase; padding: 4px 9px; border-radius: 999px; background: var(--surface); color: var(--fg); }
+.lead { position: absolute; bottom: 10px; right: 10px; font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 999px; background: var(--colza); color: var(--colza-fg); }
+.tbody { display: grid; gap: 8px; padding: 11px 13px 13px; flex: 1; align-content: start; }
+.tname { font-family: var(--f-display); font-weight: 700; font-size: 17px; line-height: 1.2; margin: 0; }
+.tplace { font-size: 12.5px; color: var(--muted); margin-top: 1px; }
+.trow { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; margin-top: auto; }
+.facts { display: flex; flex-wrap: wrap; gap: 2px 10px; font-size: 12.5px; color: var(--muted); }
+.facts b { color: var(--fg); font-weight: 600; }
+.tally { display: flex; gap: 6px; }
+.count { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 600; padding: 3px 8px; border-radius: 999px; }
+.count svg { width: 13px; height: 13px; }
+.count.up { color: var(--up); background: var(--up-soft); }
+.count.down { color: var(--down); background: var(--down-soft); }
+.count.cm { color: var(--muted); background: var(--bg); }
+.count.zero { color: var(--muted); background: transparent; box-shadow: inset 0 0 0 1px var(--line); font-weight: 500; }
+.ph { width: 100%; height: 100%; display: grid; place-items: center; align-content: center; gap: 4px; background: var(--accent-soft); color: var(--accent); }
+.ph b { font-family: var(--f-display); font-size: 42px; line-height: 1; }
+.ph span { font-family: var(--f-mono); font-size: 11px; color: var(--muted); }
+.by { font-size: 12px; color: var(--muted); }
+
+.toolbar { display: flex; justify-content: flex-end; margin-top: -8px; }
+.addbtn { display: inline-flex; align-items: center; gap: 6px; border: 1.5px dashed var(--accent); background: transparent; color: var(--accent); border-radius: 999px; padding: 6px 14px; font: inherit; font-size: 14px; font-weight: 600; cursor: pointer; }
+.addbtn:hover { background: var(--accent-soft); }
+.addbtn svg { width: 16px; height: 16px; }
+
+.mapsec { display: grid; gap: 12px; }
+.mapsec h2 { font-family: var(--f-display); font-size: 22px; margin: 0; }
+.mapwrap { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 20px; align-items: start; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 16px; }
+@media (max-width: 700px) { .mapwrap { grid-template-columns: 1fr; } }
+.map { width: 100%; max-width: 100%; height: auto; display: block; }
+.map .land { fill: var(--bg); stroke: var(--muted); stroke-linejoin: round; }
+.map .city circle { fill: var(--surface); stroke: var(--muted); }
+.map .city text { fill: var(--muted); font-family: var(--f-body); font-weight: 500; }
+.map .pin { cursor: pointer; }
+.map .pin circle.dot { fill: var(--accent); stroke: var(--surface); }
+.map .pin text.n { fill: var(--accent-fg); font-family: var(--f-body); font-weight: 700; pointer-events: none; }
+.map .pin text.l { fill: var(--fg); font: 600 16px var(--f-body); paint-order: stroke; stroke: var(--bg); stroke-width: 4px; stroke-linejoin: round; }
+.map .pin:hover circle.dot, .map .pin:focus-visible circle.dot { fill: var(--colza); }
+.map .pin:focus-visible { outline: none; }
+.legend { display: grid; gap: 4px; margin: 0; padding: 0; list-style: none; }
+.legend button { display: grid; grid-template-columns: 24px minmax(0, 1fr); gap: 10px; align-items: center; width: 100%; text-align: left; border: 0; background: none; color: var(--fg); font: inherit; padding: 6px; border-radius: 8px; cursor: pointer; }
+.legend button:hover { background: var(--bg); }
+.legend .k { width: 24px; height: 24px; border-radius: 50%; background: var(--accent); color: var(--accent-fg); display: grid; place-items: center; font-size: 12px; font-weight: 700; }
+.legend .t { font-weight: 600; font-size: 14px; }
+.legend .s { display: block; font-size: 12.5px; color: var(--muted); font-weight: 400; }
+
+/* add form */
+.aform { display: grid; gap: 14px; padding: 22px; padding-bottom: max(22px, env(safe-area-inset-bottom, 0px)); }
+.aform h2 { font-family: var(--f-display); font-size: 26px; margin: 0; }
+.aform p.lede { margin: 0; color: var(--muted); font-size: 14px; }
+.field { display: grid; gap: 4px; min-width: 0; }
+.field label { font-size: 13px; font-weight: 600; }
+.field .hint { font-size: 12px; color: var(--muted); }
+.cols { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 140px), 1fr)); gap: 12px; }
+.pick { border: 1px solid var(--line); border-radius: 12px; background: var(--surface); padding: 6px; cursor: crosshair; }
+.pick .map { max-height: 340px; margin: 0 auto; }
+.arow { display: flex; gap: 8px; justify-content: flex-end; flex-wrap: wrap; }
+.btn.ghost { background: transparent; color: var(--fg); border: 1px solid var(--line); }
+.more { border: 1px solid var(--line); border-radius: 12px; }
+.more summary { cursor: pointer; padding: 10px 12px; font-size: 14px; font-weight: 600; color: var(--accent); }
+.morebody { display: grid; gap: 14px; padding: 4px 12px 14px; }
+.pending { font-size: 12px; color: var(--muted); font-style: italic; }
+.delplace { border: 0; background: none; color: var(--muted); font: inherit; font-size: 13px; cursor: pointer; padding: 0; justify-self: start; }
+.delplace:hover { color: var(--down); }
+
+footer { font-size: 13px; color: var(--muted); }
+
+/* Detail sheet */
+dialog { border: 0; padding: 0; background: var(--surface); color: var(--fg); width: min(760px, calc(100vw - 24px)); max-height: calc(100dvh - 24px); border-radius: 18px; box-shadow: 0 24px 60px var(--shade); }
+dialog::backdrop { background: var(--scrim); }
+@media (max-width: 560px) {
+  dialog { width: 100vw; max-width: 100vw; max-height: 100dvh; height: 100dvh; margin: 0; border-radius: 0; }
+}
+.sheet { display: grid; }
+.hero { position: relative; display: block; width: 100%; padding: 0; border: 0; background: var(--line); cursor: zoom-in; aspect-ratio: 16 / 9; max-height: 46vh; overflow: hidden; }
+.hero img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.hero .ph { height: 100%; }
+.hero:not(.static):hover img { filter: brightness(.94); }
+.hero.static { cursor: default; }
+.more-ph { position: absolute; right: 12px; bottom: 12px; display: inline-flex; align-items: center; gap: 6px; font: 600 13px var(--f-body); color: #1E2A1F; background: rgb(255 255 255 / .92); padding: 7px 12px; border-radius: 999px; box-shadow: 0 2px 10px rgb(0 0 0 / .18); }
+.more-ph svg { width: 16px; height: 16px; }
+dialog.gal { width: min(1100px, calc(100vw - 24px)); }
+@media (max-width: 560px) { dialog.gal { width: 100vw; } }
+.ghead { position: sticky; top: 0; z-index: 2; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 14px 12px 18px; background: var(--surface); border-bottom: 1px solid var(--line); }
+.ghead h2 { font-family: var(--f-display); font-size: 18px; margin: 0; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ghead .n { font: 500 12px var(--f-mono); color: var(--muted); }
+.ghead button { width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--line); background: var(--surface); color: var(--fg); display: grid; place-items: center; cursor: pointer; flex: none; }
+.ghead svg { width: 18px; height: 18px; }
+.ggrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 220px), 1fr)); gap: 6px; padding: 6px; padding-bottom: max(6px, env(safe-area-inset-bottom, 0px)); }
+@media (max-width: 560px) { .ggrid { grid-template-columns: 1fr 1fr; } }
+.ggrid button { padding: 0; border: 0; background: var(--line); cursor: zoom-in; aspect-ratio: 4 / 3; overflow: hidden; border-radius: 4px; }
+.ggrid img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.big { position: fixed; inset: 0; z-index: 5; background: rgb(10 12 10 / .94); display: grid; place-items: center; padding: 56px max(12px, env(safe-area-inset-right, 0px)) 56px max(12px, env(safe-area-inset-left, 0px)); }
+.big img { max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 4px; }
+.big .bx { position: absolute; top: max(12px, env(safe-area-inset-top, 0px)); right: 12px; width: 40px; height: 40px; border-radius: 50%; border: 0; background: rgb(255 255 255 / .92); color: #1E2A1F; display: grid; place-items: center; cursor: pointer; }
+.big .bnav { position: absolute; top: 50%; transform: translateY(-50%); width: 42px; height: 42px; border-radius: 50%; border: 0; background: rgb(255 255 255 / .92); color: #1E2A1F; display: grid; place-items: center; cursor: pointer; }
+.big .bnav.l { left: 12px; } .big .bnav.r { right: 12px; }
+.big .bnav:disabled { opacity: 0; pointer-events: none; }
+.big svg { width: 20px; height: 20px; }
+.big .bc { position: absolute; bottom: max(14px, env(safe-area-inset-bottom, 0px)); left: 50%; transform: translateX(-50%); font: 500 12px var(--f-mono); color: #fff; }
+.close { position: sticky; top: 0; z-index: 2; display: flex; justify-content: flex-end; height: 0; }
+.close button { margin: 10px 10px 0 0; width: 38px; height: 38px; border-radius: 50%; border: 0; background: var(--surface); color: var(--fg); display: grid; place-items: center; box-shadow: 0 2px 10px var(--shade); cursor: pointer; }
+.close svg { width: 18px; height: 18px; }
+.content { display: grid; gap: 22px; padding: 20px 22px 28px; padding-bottom: max(28px, env(safe-area-inset-bottom, 0px)); }
+.dhead h2 { font-family: var(--f-display); font-weight: 700; font-size: clamp(24px, 5vw, 32px); line-height: 1.1; margin: 4px 0 2px; text-wrap: balance; }
+.dhead .tplace a { color: var(--accent); font-weight: 600; text-decoration: none; white-space: nowrap; }
+.dhead .tplace a:hover { text-decoration: underline; }
+.spec { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 150px), 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+.spec div { background: var(--surface); padding: 10px 12px; display: grid; gap: 2px; min-width: 0; }
+.spec dt { font-size: 12px; color: var(--muted); }
+.spec dd { margin: 0; font-weight: 600; font-size: 16px; }
+.spec dd small { font-weight: 400; color: var(--muted); font-size: 12px; }
+.say { display: grid; gap: 6px; }
+.say h3, .block h3 { font-family: var(--f-mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin: 0; font-weight: 500; }
+.say ul { margin: 0; padding-left: 18px; display: grid; gap: 4px; }
+.quote { margin: 0; padding: 10px 14px; border-radius: 12px; background: var(--accent-soft); font-size: 14px; }
+.quote b { font-weight: 600; }
+.block { display: grid; gap: 12px; }
+
+.vote { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.vbtn { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px; border-radius: 12px; border: 1.5px solid var(--line); background: var(--surface); color: var(--fg); font: inherit; font-weight: 600; cursor: pointer; }
+.vbtn svg { width: 18px; height: 18px; }
+.vbtn .n { font-family: var(--f-mono); font-variant-numeric: tabular-nums; color: var(--muted); font-weight: 500; }
+.vbtn.up[aria-pressed="true"] { border-color: var(--up); background: var(--up-soft); color: var(--up); }
+.vbtn.down[aria-pressed="true"] { border-color: var(--down); background: var(--down-soft); color: var(--down); }
+.vbtn:hover:not(:disabled) { border-color: var(--muted); }
+.vbtn:disabled { opacity: .55; cursor: not-allowed; }
+.voters { font-size: 13px; color: var(--muted); display: grid; gap: 2px; }
+.voters b { color: var(--fg); font-weight: 600; }
+
+.comments { display: grid; gap: 10px; }
+.cmt { display: grid; grid-template-columns: 32px minmax(0, 1fr); gap: 10px; align-items: start; }
+.av { width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; font-weight: 600; font-size: 13px; color: var(--accent-fg); background: var(--accent); }
+.bubble { background: var(--bg); border-radius: 4px 12px 12px 12px; padding: 8px 12px; min-width: 0; }
+.bubble .who { font-size: 13px; font-weight: 600; display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; }
+.bubble .when { font-weight: 400; color: var(--muted); font-size: 12px; }
+.bubble p { margin: 2px 0 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+.del { margin-left: auto; border: 0; background: none; color: var(--muted); font: inherit; font-size: 12px; cursor: pointer; padding: 0; }
+.del:hover { color: var(--down); }
+.empty { color: var(--muted); font-size: 14px; }
+
+form.compose { display: grid; gap: 8px; }
+textarea, input[type=text], input[type=url], input[type=number] { font: inherit; color: var(--fg); background: var(--bg); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; width: 100%; box-sizing: border-box; }
+textarea { resize: vertical; min-height: 70px; }
+textarea:focus-visible, input:focus-visible, button:focus-visible, a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.namegate { display: grid; gap: 6px; padding: 12px; border-radius: 12px; border: 1.5px solid var(--colza); background: var(--surface); }
+.namegate label { font-size: 14px; font-weight: 600; }
+.namegate .hint { font-size: 12px; color: var(--muted); }
+.crow { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: space-between; }
+.as { font-size: 13px; color: var(--muted); }
+.as button { border: 0; background: none; color: var(--accent); font: inherit; font-weight: 600; cursor: pointer; padding: 0; }
+.btn { border: 0; border-radius: 10px; padding: 10px 18px; font: inherit; font-weight: 600; background: var(--accent); color: var(--accent-fg); cursor: pointer; }
+.btn:disabled { opacity: .55; cursor: not-allowed; }
+.err { color: var(--down); font-size: 13px; margin: 0; }
+
+@media (prefers-reduced-motion: reduce) { .tile, .photo img { transition: none; } .tile:hover .photo img { transform: none; } }
+</style>
+</head>
+<body>
+
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">15 → 18 avril 2027 · 14 personnes · 3 nuits</div>
+    <h1>OGP Trip<span class="dot">.</span> On dort où&nbsp;?</h1>
+  </header>
+
+  <div class="toolbar">
+    <button type="button" class="addbtn" id="addBtn" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Ajouter un lieu</button>
+  </div>
+  <div class="notice" id="notice" hidden></div>
+
+  <main class="grid" id="grid"></main>
+
+  <section class="mapsec" aria-labelledby="mapH">
+    <h2 id="mapH">Où c'est</h2>
+    <div class="mapwrap">
+      <svg class="map" id="map" role="img" aria-label="Carte de France avec les logements"></svg>
+      <ol class="legend" id="legend"></ol>
+    </div>
+  </section>
+
+</div>
+
+<dialog id="dlg" aria-labelledby="dTitle">
+  <div class="close"><button type="button" id="closeBtn" aria-label="Fermer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>
+  <div class="sheet">
+    <button type="button" class="hero" id="dHero"></button>
+    <div class="content">
+      <div class="dhead">
+        <div class="eyebrow" id="dTag"></div>
+        <h2 id="dTitle"></h2>
+        <div class="tplace" id="dPlace"></div>
+      </div>
+      <button type="button" class="delplace" id="dDel" hidden></button>
+      <dl class="spec" id="dSpec"></dl>
+      <div class="say" id="dSay"></div>
+
+      <section class="block" aria-labelledby="vH">
+        <h3 id="vH">Ton avis</h3>
+        <div class="vote">
+          <button type="button" class="vbtn up" id="vUp" aria-pressed="false"></button>
+          <button type="button" class="vbtn down" id="vDown" aria-pressed="false"></button>
+        </div>
+        <div class="voters" id="dVoters"></div>
+      </section>
+
+      <section class="block" aria-labelledby="cH">
+        <h3 id="cH">Commentaires</h3>
+        <div class="comments" id="dComments"></div>
+        <form class="compose" id="compose" novalidate>
+          <label for="cText" class="as" style="font-weight:600;color:var(--fg)">Ajouter un commentaire</label>
+          <textarea id="cText" maxlength="800" placeholder="Ex. : top pour 14, mais 5 chambres ça fait juste…"></textarea>
+          <div class="namegate" id="gate" hidden>
+            <label for="cName">Ton prénom, pour publier</label>
+            <input type="text" id="cName" maxlength="40" autocomplete="given-name" placeholder="Prénom">
+            <span class="hint">Il s'affiche à côté de ton commentaire et de tes votes. Demandé une seule fois sur cet appareil.</span>
+          </div>
+          <p class="err" id="cErr" hidden></p>
+          <div class="crow">
+            <span class="as" id="asWho"></span>
+            <button type="submit" class="btn" id="cSend">Publier</button>
+          </div>
+        </form>
+      </section>
+    </div>
+  </div>
+</dialog>
+
+<dialog id="galDlg" class="gal" aria-labelledby="gTitle">
+  <div class="ghead"><div style="min-width:0"><h2 id="gTitle"></h2><div class="n" id="gN"></div></div><button type="button" id="gClose" aria-label="Fermer la galerie"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>
+  <div class="ggrid" id="gGrid"></div>
+  <div class="big" id="big" hidden>
+    <img id="bImg" alt="">
+    <button type="button" class="bnav l" id="bPrev" aria-label="Photo précédente"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button>
+    <button type="button" class="bnav r" id="bNext" aria-label="Photo suivante"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></button>
+    <button type="button" class="bx" id="bClose" aria-label="Revenir à la grille"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+    <span class="bc" id="bCount"></span>
+  </div>
+</dialog>
+
+<dialog id="addDlg" aria-labelledby="aTitle">
+  <div class="close"><button type="button" id="aClose" aria-label="Fermer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>
+  <form class="aform" id="aForm" novalidate>
+    <h2 id="aTitle">Ajouter un lieu</h2>
+    <p class="lede">Colle juste le lien de l'annonce. Le lieu apparaît tout de suite pour tout le monde, et Paul complète les infos et les photos ensuite.</p>
+    <div class="field"><label for="aUrl">Lien de l'annonce</label><input type="url" id="aUrl" required placeholder="https://www.gites-de-france.com/…"></div>
+    <div class="field"><label for="aWho">Ton prénom</label><input type="text" id="aWho" required maxlength="40" autocomplete="given-name" placeholder="Prénom"></div>
+    <details class="more" id="aMore"><summary>Ajouter des détails (facultatif)</summary><div class="morebody">
+    <div class="field"><label for="aName">Nom du lieu</label><input type="text" id="aName" required maxlength="60" placeholder="Le Moulin de…"></div>
+    <div class="field"><label for="aTown">Ville et département</label><input type="text" id="aTown" maxlength="70" placeholder="Amboise · Indre-et-Loire"></div>
+    <div class="cols">
+      <div class="field"><label for="aPrice">Prix total (€)</label><input type="number" id="aPrice" required min="0" step="10" inputmode="numeric" placeholder="2400"></div>
+      <div class="field"><label for="aCap">Couchages</label><input type="number" id="aCap" min="1" inputmode="numeric" placeholder="15"></div>
+      <div class="field"><label for="aRooms">Chambres</label><input type="number" id="aRooms" min="1" inputmode="numeric" placeholder="7"></div>
+      <div class="field"><label for="aParis">Depuis Paris</label><input type="text" id="aParis" maxlength="12" placeholder="2h"></div>
+      <div class="field"><label for="aBdx">Depuis Bordeaux</label><input type="text" id="aBdx" maxlength="12" placeholder="4h30"></div>
+    </div>
+    <div class="field"><label for="aNote">Pourquoi ce lieu</label><textarea id="aNote" maxlength="400" placeholder="Grande cuisine, piscine chauffée, gare à 10 min…"></textarea></div>
+    <div class="field"><span class="field" style="gap:2px"><label id="aPinL">Où c'est sur la carte</label><span class="hint" id="aPinHint">Touche la carte à peu près à l'endroit du lieu.</span></span>
+      <div class="pick"><svg class="map" id="pickMap" role="img" aria-labelledby="aPinL"></svg></div></div>
+    </div></details>
+    <p class="err" id="aErr" hidden></p>
+    <div class="arow"><button type="button" class="btn ghost" id="aCancel">Annuler</button><button type="submit" class="btn" id="aSave">Ajouter le lieu</button></div>
+  </form>
+</dialog>
+
+<script>
+const HOUSES = [
+  { id: "ferme", tag: "Ferme 1", name: "La Ferme des Tourelles", place: "Boutigny-Prouais · Eure-et-Loir", kind: "Gîte",
+    price: 2550, cap: 24, rooms: 7, size: "320 m²", paris: "2h20", bordeaux: "5h", lat: 48.72, lon: 1.57, lab: "l", ldy: -4,
+    url: "https://www.gites-de-france.com/fr/centre-val-de-loire/eure-et-loir/la-ferme-des-tourelles-24-h28g008729?from=2027-04-15&to=2027-04-18&adults=14&children=0&infants=1",
+    points: ["La plus grande : jusqu'à 24 couchages, donc de la marge pour 14", "Grande cour et jardin avec tables pour manger dehors"],
+    paul: null, photos: ["img/ferme-01.jpg", "img/ferme-02.jpg", "img/ferme-03.jpg", "img/ferme-04.jpg", "img/ferme-05.jpg", "img/ferme-06.jpg", "img/ferme-07.jpg", "img/ferme-08.jpg", "img/ferme-09.jpg", "img/ferme-10.jpg", "img/ferme-11.jpg", "img/ferme-12.jpg", "img/ferme-13.jpg", "img/ferme-14.jpg", "img/ferme-15.jpg", "img/ferme-16.jpg", "img/ferme-17.jpg", "img/ferme-18.jpg", "img/ferme-19.jpg", "img/ferme-20.jpg", "img/ferme-21.jpg", "img/ferme-22.jpg", "img/ferme-23.jpg", "img/ferme-24.jpg", "img/ferme-25.jpg", "img/ferme-26.jpg", "img/ferme-27.jpg", "img/ferme-28.jpg", "img/ferme-29.jpg", "img/ferme-30.jpg", "img/ferme-31.jpg", "img/ferme-32.jpg", "img/ferme-33.jpg", "img/ferme-34.jpg", "img/ferme-35.jpg", "img/ferme-36.jpg", "img/ferme-37.jpg", "img/ferme-38.jpg", "img/ferme-39.jpg", "img/ferme-40.jpg", "img/ferme-41.jpg", "img/ferme-42.jpg", "img/ferme-43.jpg", "img/ferme-44.jpg", "img/ferme-45.jpg"] },
+  { id: "manoir1", tag: "Manoir 1", name: "Le Manoir du Pont", place: "Bailleau-Armenonville · Eure-et-Loir", kind: "Chambres d'hôtes",
+    price: 2400, cap: 15, rooms: 8, size: null, paris: "1h", bordeaux: "5h", lat: 48.53, lon: 1.64, lab: "l", ldy: 16,
+    url: "https://www.gites-de-france.com/fr/centre-val-de-loire/eure-et-loir/le-manoir-du-pont-h28h008570?from=2027-04-15&to=2027-04-18&adults=14&children=0&infants=1",
+    points: ["Le plus proche de Paris", "Spa de nage intérieur et salle à manger voûtée avec cheminée", "Chambres d'hôtes : 5 chambres et suites réservées une par une, petit-déjeuner inclus. En prenant les 5, pas d'autres clients, mais les propriétaires vivent sur place", "Aucune cuisine indiquée dans les équipements : à vérifier pour les dîners"],
+    paul: null, photos: ["img/manoir1-01.jpg", "img/manoir1-02.jpg", "img/manoir1-03.jpg", "img/manoir1-04.jpg", "img/manoir1-05.jpg", "img/manoir1-06.jpg", "img/manoir1-07.jpg", "img/manoir1-08.jpg", "img/manoir1-09.jpg", "img/manoir1-10.jpg", "img/manoir1-11.jpg", "img/manoir1-12.jpg", "img/manoir1-13.jpg", "img/manoir1-14.jpg", "img/manoir1-15.jpg", "img/manoir1-16.jpg", "img/manoir1-17.jpg", "img/manoir1-18.jpg", "img/manoir1-19.jpg", "img/manoir1-20.jpg", "img/manoir1-21.jpg"] },
+  { id: "gite", tag: "Gîte 1", name: "Gîte de la Cunaille", place: "Thoré-la-Rochette · Loir-et-Cher", kind: "Gîte de groupe",
+    price: 2400, cap: 15, rooms: 5, size: null, paris: "2h20", bordeaux: "4h", lat: 47.79, lon: 0.97, lab: "l", ldy: 5,
+    url: "https://www.gites-de-france.com/fr/centre-val-de-loire/loir-et-cher/gite-de-la-cunaille-41g3022?from=2027-04-15&to=2027-04-18&adults=14&children=0&infants=1",
+    points: ["Le plus proche de Bordeaux", "Piscine extérieure et jacuzzi intérieur"],
+    paul: "5 chambres par contre.", photos: ["img/gite-01.jpg", "img/gite-02.jpg", "img/gite-03.jpg", "img/gite-04.jpg", "img/gite-05.jpg", "img/gite-06.jpg", "img/gite-07.jpg", "img/gite-08.jpg", "img/gite-09.jpg", "img/gite-10.jpg", "img/gite-11.jpg", "img/gite-12.jpg", "img/gite-13.jpg", "img/gite-14.jpg", "img/gite-15.jpg", "img/gite-16.jpg", "img/gite-17.jpg", "img/gite-18.jpg", "img/gite-19.jpg", "img/gite-20.jpg", "img/gite-21.jpg", "img/gite-22.jpg", "img/gite-23.jpg", "img/gite-24.jpg", "img/gite-25.jpg", "img/gite-26.jpg", "img/gite-27.jpg"] },
+  { id: "manoir2", tag: "Manoir 2", name: "Le domaine de La Chapelle-sur-Dun", place: "Près de Dieppe · Seine-Maritime", kind: "Maison de vacances",
+    price: 1108, cap: 14, rooms: 7, size: "300 m²", paris: "2h30", bordeaux: "7h", lat: 49.86, lon: 0.86, lab: "r", ldy: 5,
+    url: "https://www.gites.fr/d/61682276",
+    points: ["Court de tennis privé, 6 salles de bain", "À quelques minutes des plages et de Veules-les-Roses"],
+    paul: "Pas cher du tout. 7h depuis Bordeaux par contre : plutôt le train jusqu'à Paris et on vous récupère en voiture ?", photos: ["img/manoir2-01.jpg", "img/manoir2-02.jpg", "img/manoir2-03.jpg", "img/manoir2-04.jpg", "img/manoir2-05.jpg", "img/manoir2-06.jpg", "img/manoir2-07.jpg", "img/manoir2-08.jpg", "img/manoir2-09.jpg", "img/manoir2-10.jpg", "img/manoir2-11.jpg", "img/manoir2-12.jpg", "img/manoir2-13.jpg", "img/manoir2-14.jpg", "img/manoir2-15.jpg", "img/manoir2-16.jpg", "img/manoir2-17.jpg", "img/manoir2-18.jpg", "img/manoir2-19.jpg", "img/manoir2-20.jpg", "img/manoir2-21.jpg", "img/manoir2-22.jpg", "img/manoir2-23.jpg", "img/manoir2-24.jpg", "img/manoir2-25.jpg", "img/manoir2-26.jpg", "img/manoir2-27.jpg", "img/manoir2-28.jpg", "img/manoir2-29.jpg", "img/manoir2-30.jpg", "img/manoir2-31.jpg", "img/manoir2-32.jpg", "img/manoir2-33.jpg", "img/manoir2-34.jpg", "img/manoir2-35.jpg"] },
+];
+const GROUP = 14;
+const FRANCE = "M610.5,509.7L609.4,518.4L610.2,521L611.7,522.9L612.4,524.9L613.6,548.3L613.3,550.2L608.2,559.7L607.2,562.4L606.9,574.2L606,577.3L604.2,580.4L601.1,590.4L598.3,594.9L590.7,589.4L586.2,587.1L584.1,584.5L582.7,582.7L583.5,580.3L585.6,577.9L585.9,575.9L581.2,573.7L578.9,572.3L578.9,569.8L580.6,565.8L579.8,562.5L577.2,562.7L574.9,562.2L574.8,560.4L576.3,558.2L578.3,555.4L578.2,552.3L575.8,550.9L573.6,548.3L572.7,544.9L574.5,542.5L577.2,540.9L575.2,537.4L573.7,537.3L572.7,536.6L573.6,534.9L575.7,532.4L578.8,525L583,521.6L590.4,519.3L592.5,518.3L594.3,515.7L596.3,514.1L598.7,514.3L601.1,515.2L602.4,516.4L603.6,515.2L604.5,512L603.9,509.2L604.2,501.4L605.6,497L607.8,496.7L609.7,499.2L609.6,501.2L610.3,506.4L610.5,509.7ZM533.4,222.4L528.4,225.1L527.3,227.5L525.4,230.6L522.1,232L519,232.4L516.3,232L514.9,230.7L513.7,228.7L510.2,228.7L506.7,230.8L503.9,234.4L504.7,236.4L507.4,236.9L508,238.7L507.1,239.9L506.1,242L500.6,248.2L495.1,254.5L494.2,256.4L492.6,257.7L485.6,261.1L484.8,262.4L484.4,268L483.6,272.7L478.4,277L473.4,281.4L472,284L471.1,287L469.5,290.5L469.2,292.3L471.7,295.3L471.4,297.7L470.7,301.3L468.2,303.8L465.5,305.1L465.5,309L467,309.5L470.3,309.2L475,306.5L478,302.8L476.2,299.5L476.3,298L480.1,294.4L484.4,292.2L490.6,291.8L498.1,293L498.4,295.8L499.1,299.2L500.4,301.5L498.6,308.1L500,310.1L502.1,312.6L503.7,314.9L506.1,317L508.2,320.4L508.9,322.4L505.5,325.9L500,329.2L499.2,331.2L499.4,333.5L500,335.4L503.1,337.8L506.4,343.1L508.6,347.9L513.2,352.6L514.4,354L512.8,357.1L511.3,363.7L509.4,364.7L507.3,365.1L501.5,369.9L498.9,369.3L495.2,369.4L492.7,370.9L492.9,373.9L495.2,376.7L496.6,379.6L497.2,382.7L499.8,385L503.4,386.4L505.5,386.5L506.8,387.3L507.7,388.3L509.2,395L508.3,396.7L506.4,397.4L505.2,400.1L502.8,404.2L501.5,407.4L503,410.2L503.6,412.3L502.8,414.5L503.9,417.8L506.7,421.1L514.1,425.9L521.1,429.7L523.3,430.3L532.7,427.9L534.3,428.1L535.5,431L536,433L534.9,435.9L532.4,440.1L529.6,443.3L527.9,446.1L528.2,448.6L528.4,452L526.2,453L525.1,451.8L523.8,452.8L523.6,454.1L518.9,456.2L515.5,458.4L502.4,471.7L496.3,475.6L495.1,477.9L493.9,482.3L490.3,486L487.1,487.8L479.3,489.7L471.4,493.6L468,492L458.8,492.1L453.2,487.3L442.1,484.3L438.6,477.3L433.7,476.9L430.4,477.1L428.5,476L427.9,473.6L427.9,471.4L424.5,472.4L421.8,472.4L420.1,473.3L419,474.4L417.5,473.6L416.7,475.3L413.5,475.6L410,474.8L401,471.1L399.6,470.6L393.4,469.3L390.9,467.8L388.8,464.2L387.1,463.1L380.4,464.2L378.4,467L375.2,470.3L353.5,486.5L349.5,493.1L344.9,503.1L344.6,507.7L346.5,522.5L351,530.3L351.6,532.2L349.1,532.2L344.9,531.1L341.5,530L338.4,530.6L335.2,532.3L332.4,533.2L330.5,533.5L329.1,534.4L328.6,536.2L328.4,537.6L325,537.3L317,534.6L309.8,532.7L305.5,534.8L302.8,536.8L300.9,536.5L299.6,534.5L298.5,532.4L295.7,530.6L289.3,527.8L289.7,526.5L290.8,524.6L290.8,523.4L289.4,521.8L283.6,519.9L281,519.5L279.2,520.7L277.9,522.3L274.6,516.6L272.3,515.4L268.8,515.2L264.8,513.4L260.6,511.2L250.5,507.7L247.7,507.3L246.6,507.8L245.9,510L245.4,515.9L240.2,516.9L234.4,516L231.8,516.5L229.4,516.5L227.1,514.8L217.2,516.7L215.6,515.7L213.2,513L210.3,510.8L208.3,509.8L206.5,508.4L204.8,508.2L202.5,509.5L199,510L196.2,509.9L194.7,510.1L188.3,503.4L187.4,501.7L184.2,501.1L180.3,501L170.4,496.8L165.7,494.4L165.1,493L163.1,494.2L162.3,495.7L159.9,495.8L158.6,494.9L157.7,493.7L158.6,491.7L160.1,489.1L160.8,486.1L160.7,483.6L158.2,482L154.4,481.2L151.8,481L148.2,479.6L146.4,478.5L144.9,475.6L144.8,473.5L151.5,471.8L157.6,464.2L163.4,436.8L167.5,404.4L170.5,398.3L174.4,396.6L171.2,392.2L169.3,394.4L168.6,396.8L167.5,398L169.8,368.3L171.4,357.4L174.2,346L180,350.5L184.8,355.1L187.3,359.2L190.4,372.4L192.7,375.2L196.2,377.9L194.9,374.9L192.4,372.6L188.6,354.9L186.3,349.9L182.5,345.7L170.6,336.9L169.5,335.1L168.9,331.8L172.9,331.9L176.3,333.5L175.9,331.7L174.8,329.7L173.3,322.5L172,305.7L172.1,302.8L171.5,299.3L167.7,298.6L164.7,298.3L161.4,297L145.1,287.1L139.6,276.9L133.8,269.4L132.4,266.1L132.6,262.7L135.6,255.7L132.9,251.3L130.4,250.4L128.1,248.2L130.2,244.6L131.8,242.2L135.1,241.6L139.6,242.4L143.7,244.5L146.9,245L137.3,239.4L121.7,241.3L118.3,240.5L115.5,239.3L114.4,235.1L116.7,233.2L118.6,229.7L116.4,227.3L113.4,226.4L108.8,226.5L104.5,227.2L103.4,225.7L106,221.9L103.7,220.4L100.8,221.2L96.5,221.9L92.3,220.7L88.4,216.4L85.9,216.4L84.1,216.9L81.4,215.2L78.6,214.8L76.7,215.3L74,212.8L57.8,207.7L50.8,207.1L44.4,209.4L40.8,208.7L38.2,205.3L36.1,199.9L25.7,195.6L27.8,192.8L32.5,192.2L38,190.2L40.1,187.8L35.8,184.9L32.5,184.2L31.2,183.1L29.8,180.6L31.8,179.4L33.1,180L37,180.4L43.7,179.8L41.3,177.2L38.6,176.6L37.4,176L32.1,175.6L29.5,176.6L24,176.2L22.7,173.4L22.3,171L23.9,165.6L31.8,160.9L51.3,155.5L59.6,156.3L65.5,155.3L72.5,152.1L75.5,149.2L85.5,147.5L94.8,150.5L103.6,161.9L107.8,165.7L117.9,159.1L133,159.3L136.2,163L137.3,159.9L140.2,156.2L142.4,157.8L143.6,160.1L159.5,159.5L162,158.9L157.7,156.2L154.3,149.7L153.5,125.9L149.1,119.2L144,108.6L141.7,102.3L141.5,100.1L142.2,97L148.5,97.1L153.3,97.9L162.5,95.5L166.9,97.2L166.6,102.1L168,108.4L169.6,111.3L171.8,114.7L179.3,114.4L187.3,116.4L197.4,116.7L212.1,120.2L218.4,118.1L224.5,113.9L236.1,111.1L237.1,109.6L230.4,110.2L224.2,107.5L223.4,104.5L224.2,101.9L226.6,95.9L244.4,86.3L257,83.4L270.3,78.1L277,72.7L281.4,65.6L282.9,64.2L284.7,62.8L282.9,60.3L284.1,33.7L285.4,28.9L288,24.9L292,21.9L297.9,18.6L319.9,14L323.2,12.2L323.6,15L325.3,18.7L326.3,20.7L325.4,23.3L326.2,25.4L329.1,29.3L332.9,32.9L336.1,35.3L339.6,34.4L343.7,32L347.3,31.3L349.2,33L350.3,34.1L352.5,38.3L353.1,42.5L354.1,46.1L355.9,47.5L362.5,48L367.4,49.4L368.7,50.5L370.3,58.5L371.2,59.6L372.6,58.7L373.8,57.4L375.4,57.2L378.2,57.7L382.1,57.8L385.9,58.7L391.3,63.3L391.1,64.7L390.1,67.3L389.7,69.4L390.6,70.2L392,72.3L391.7,74.8L390.3,76.6L389.8,78L390.3,79.7L391.4,80.3L399.3,81.3L406.6,80.3L411.2,77.8L412,75.2L413.3,72.2L416,69.6L417.9,68.8L419.7,69.8L416.7,80.4L418.8,83.1L419.1,87.2L420,90.8L422.5,90.6L425.6,91.3L427.9,92.6L430.6,94.7L434.3,96.7L436.9,97.3L437.8,99L440.1,100.9L443.3,104.7L446.3,107.3L447.8,107.3L450.6,106.3L454.8,105.6L458.1,105.8L459.4,107.7L462.7,108.6L463.7,109.4L465,110.8L467.1,111.3L469.8,110.8L471.6,108.9L474.1,108L476.6,108.4L478.1,109.4L481,110.9L482.4,110.5L485.6,111.5L488.8,114.3L490,117.2L490.5,118.8L491.8,120.5L497,128.4L498.8,128.8L500.6,127.5L501.8,125.9L503.6,125.5L506.2,126.3L508,127.2L508.9,130.6L510.7,130.5L512.9,130.3L516.2,131.2L521,130.2L524.7,128.8L526.6,128.9L529.7,132.8L533.3,134.3L541,135.4L549.4,137.3L552.6,138.9L554.9,139.6L555.2,144.8L546.1,156.1L542.7,159.8L540.9,165.2L539.5,173.4L537.2,181.2L533.4,188.6L532.1,194.2L533.1,197.8L532.6,203.7L530.3,211.6L529.9,217.6L531.4,221.6L533.4,222.4ZM170.2,323.8L168.7,329L166,324.2L162.3,319.9L161.6,316.1L165.9,317.8L170.2,323.8Z";
+const MAP_W = 620, MAP_H = 606, MC = Math.cos(46.5 * Math.PI / 180), MK = 60, LON0 = -5.3, LAT0 = 51.3;
+const proj = (lat, lon) => [(lon - LON0) * MC * MK, (LAT0 - lat) * MK];
+const unproj = (x, y) => [LAT0 - y / MK, x / (MC * MK) + LON0];
+const CITIES = [["Paris", 48.857, 2.352, "r"], ["Bordeaux", 44.84, -0.58, "r"]];
+
+const $ = id => document.getElementById(id);
+const NS = "http://www.w3.org/2000/svg";
+const svg = d => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
+const I_UP = svg('<path d="M7 11v9H4v-9zM7 11l4-8c1.7 0 2.8 1.3 2.4 3L13 9h5.3a2 2 0 0 1 2 2.4l-1.4 7A2 2 0 0 1 17 20H7"/>');
+const I_DOWN = svg('<path d="M17 13V4h3v9zM17 13l-4 8c-1.7 0-2.8-1.3-2.4-3l.4-3H5.7a2 2 0 0 1-2-2.4l1.4-7A2 2 0 0 1 7 4h10"/>');
+const I_CM = svg('<path d="M20 15a2 2 0 0 1-2 2H8l-4 4V5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2z"/>');
+const eur = n => Number(n || 0).toLocaleString("fr-FR") + " €";
+const safeUrl = u => { try { const x = new URL(u); return x.protocol === "https:" || x.protocol === "http:" ? x.href : ""; } catch { return ""; } };
+const host = u => { try { return new URL(u).hostname.replace(/^www\./, ""); } catch { return ""; } };
+const num = v => { const n = Number(v); return Number.isFinite(n) && n > 0 ? Math.round(n) : null; };
+
+let db = null, canWrite = false, isOwner = false, voterKey = null, myName = "";
+let votes = {}, comments = [], added = [];
+let openId = null, pending = null, deleteArm = null, delPlaceArm = false, pickPos = null;
+
+try { myName = localStorage.getItem("opg-name") || ""; } catch {}
+
+/* all places: Paul's four, then the group's additions */
+function places() { return [...HOUSES, ...added].map((h, i) => ({ ...h, tag: String(i + 1) })); }
+function byId(id) { return places().find(h => h.id === id); }
+function fromDoc(d) {
+  const x = d.data() || {};
+  const url = safeUrl(x.url || "");
+  if (!url) return null;
+  const nm = typeof x.name === "string" && x.name.trim() ? x.name.trim().slice(0, 60) : "Lieu sur " + host(url);
+  const photos = Array.isArray(x.photos) ? x.photos.filter(p => typeof p === "string" && /^img\/[\w.-]+\.jpg$/.test(p)).slice(0, 80) : [];
+  const pts = [];
+  if (typeof x.note === "string" && x.note.trim()) pts.push(x.note.trim());
+  const lat = Number(x.lat), lon = Number(x.lon);
+  const okPos = Number.isFinite(lat) && Number.isFinite(lon) && lat > 41 && lat < 52 && lon > -6 && lon < 10;
+  return {
+    id: "p-" + d.id, docId: d.id, added: true, by: String(x.by || "").slice(0, 40), voter: x.voter || null, at: x.at || "",
+    tag: (typeof x.tag === "string" && x.tag.trim()) ? x.tag.trim().slice(0, 24) : "Nouveau lieu", name: nm, pending: !x.filled,
+    place: (typeof x.town === "string" && x.town.trim()) ? x.town.trim().slice(0, 70) : host(url), kind: "Proposé par " + (String(x.by || "le groupe").slice(0, 40)),
+    price: num(x.price) || 0, cap: num(x.cap), rooms: num(x.rooms), size: null,
+    paris: String(x.paris || "").slice(0, 12) || "?", bordeaux: String(x.bordeaux || "").slice(0, 12) || "?",
+    lat: okPos ? lat : null, lon: okPos ? lon : null, lab: "r", ldy: 5, url, points: pts, paul: null, photos,
+  };
+}
+
+function tallies(hid) {
+  let up = 0, down = 0; const ups = [], downs = [];
+  for (const d of Object.values(votes)) {
+    const v = d?.v?.[hid];
+    if (v === 1) { up++; ups.push(d.name || "Quelqu'un"); }
+    if (v === -1) { down++; downs.push(d.name || "Quelqu'un"); }
+  }
+  return { up, down, ups, downs, score: up - down };
+}
+function leaderId() {
+  const ranked = places().map(h => ({ id: h.id, ...tallies(h.id) })).filter(t => t.up + t.down > 0)
+    .sort((a, b) => b.score - a.score || b.up - a.up);
+  if (!ranked.length || ranked[0].score <= 0) return null;
+  if (ranked[1] && ranked[1].score === ranked[0].score && ranked[1].up === ranked[0].up) return null;
+  return ranked[0].id;
+}
+const cCount = hid => comments.filter(c => c.house === hid).length;
+
+function renderStats() {
+  const ids = new Set(places().map(h => h.id));
+  const voters = Object.values(votes).filter(d => d?.v && Object.entries(d.v).some(([k, x]) => ids.has(k) && (x === 1 || x === -1))).length;
+  const nC = comments.filter(c => ids.has(c.house)).length;
+  const lead = leaderId();
+  const s = $("stats"); s.replaceChildren();
+  const add = (label, val) => { const e = document.createElement("span"); e.className = "stat"; const b = document.createElement("b"); b.textContent = val; e.append(b, " " + label); s.append(e); };
+  add(places().length > 1 ? "lieux" : "lieu", places().length);
+  add(voters > 1 ? "personnes ont voté" : "personne a voté", voters);
+  add(nC > 1 ? "commentaires" : "commentaire", nC);
+  if (lead) add("est en tête", byId(lead).tag);
+}
+
+function ph(h) {
+  const d = document.createElement("div"); d.className = "ph";
+  const b = document.createElement("b"); b.textContent = h.name.charAt(0).toUpperCase();
+  const s = document.createElement("span"); s.textContent = host(h.url);
+  d.append(b, s); return d;
+}
+function countEl(cls, icon, n, title) {
+  const e = document.createElement("span"); e.className = "count " + (n ? cls : "zero"); e.title = title;
+  e.innerHTML = icon; const v = document.createElement("span"); v.className = "num"; v.textContent = n; e.append(v); return e;
+}
+function tileEl(h) {
+  const t = tallies(h.id), lead = leaderId() === h.id;
+  const b = document.createElement("button");
+  b.type = "button"; b.className = "tile"; b.setAttribute("aria-label", `${h.tag}. ${h.name} : voir le détail, voter et commenter`);
+  b.onclick = () => openHouse(h.id);
+  const photo = document.createElement("div"); photo.className = "photo";
+  if (h.photos.length) { const im = document.createElement("img"); im.alt = ""; im.loading = "lazy"; im.src = h.photos[0]; photo.append(im); } else photo.append(ph(h));
+  const tag = document.createElement("span"); tag.className = "tag"; tag.textContent = h.tag; photo.append(tag);
+  const body = document.createElement("div"); body.className = "tbody";
+  const head = document.createElement("div");
+  const nm = document.createElement("h2"); nm.className = "tname"; nm.textContent = h.name;
+  const pl = document.createElement("div"); pl.className = "tplace"; pl.textContent = h.place;
+  head.append(nm, pl);
+  const facts = document.createElement("div"); facts.className = "facts";
+  const f = (label, val, after) => { if (val == null || val === "?") return; const sp = document.createElement("span"); if (label) sp.append(label + " "); const bb = document.createElement("b"); bb.textContent = val; sp.append(bb); if (after) sp.append(" " + after); facts.append(sp); };
+  if (h.price) f("", eur(Math.round(h.price / GROUP)), "/ pers.");
+  f("", h.rooms, "ch.");
+  f("Paris", h.paris); f("Bordeaux", h.bordeaux);
+  if (h.pending) { const pe = document.createElement("span"); pe.className = "pending"; pe.textContent = "Infos à venir"; facts.append(pe); }
+  const row = document.createElement("div"); row.className = "trow";
+  const tally = document.createElement("div"); tally.className = "tally";
+  tally.append(countEl("up", I_UP, t.up, "Pour"), countEl("down", I_DOWN, t.down, "Contre"), countEl("cm", I_CM, cCount(h.id), "Commentaires"));
+  row.append(tally);
+  body.append(head, facts, row);
+  b.append(photo, body);
+  return b;
+}
+function renderGrid() {
+  $("grid").replaceChildren(...places().map(tileEl));
+  renderMap();
+}
+
+/* ---------- map ---------- */
+function el(tag, attrs = {}, text) { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (text != null) e.textContent = text; return e; }
+function baseMap(target, vb = [0, 0, MAP_W, MAP_H]) {
+  const k = vb[2] / 420;
+  target.setAttribute("viewBox", vb.map(v => Math.round(v * 10) / 10).join(" "));
+  target.replaceChildren(el("path", { class: "land", d: FRANCE, "stroke-width": 1.2 * k }));
+  for (const [name, lat, lon] of CITIES) {
+    const [x, y] = proj(lat, lon); const g = el("g", { class: "city" });
+    g.append(el("circle", { cx: x, cy: y, r: 4 * k, "stroke-width": 2 * k }), el("text", { x: x + 9 * k, y: y + 4.5 * k, style: `font-size:${13 * k}px` }, name));
+    target.append(g);
+  }
+  return k;
+}
+/* fit the view around the pins plus Paris and Bordeaux, then push overlapping pins apart */
+function fitView(pts) {
+  const all = [...pts, ...CITIES.map(([, la, lo]) => proj(la, lo))];
+  let x0 = Math.min(...all.map(p => p[0])), x1 = Math.max(...all.map(p => p[0]));
+  let y0 = Math.min(...all.map(p => p[1])), y1 = Math.max(...all.map(p => p[1]));
+  const pad = 34; x0 -= pad; y0 -= pad; x1 += pad + 40; y1 += pad;
+  let w = x1 - x0, h = y1 - y0;
+  if (w < 240) { x0 -= (240 - w) / 2; w = 240; }
+  if (h < 240) { y0 -= (240 - h) / 2; h = 240; }
+  return [x0, y0, w, h];
+}
+function spread(pts, r) {
+  const q = pts.map(p => [p[0], p[1]]), min = 2 * r + r * 0.35;
+  for (let it = 0; it < 120; it++) {
+    let moved = false;
+    for (let i = 0; i < q.length; i++) for (let j = i + 1; j < q.length; j++) {
+      let dx = q[j][0] - q[i][0], dy = q[j][1] - q[i][1], d = Math.hypot(dx, dy);
+      if (d >= min) continue;
+      if (d < 0.01) { dx = 0; dy = 1; d = 1; }
+      const push = (min - d) / 2;
+      q[i][0] -= dx / d * push; q[i][1] -= dy / d * push;
+      q[j][0] += dx / d * push; q[j][1] += dy / d * push; moved = true;
+    }
+    if (!moved) break;
+  }
+  return q;
+}
+function renderMap() {
+  const m = $("map"), list = places();
+  const located = list.map((h, i) => ({ h, i })).filter(o => o.h.lat != null);
+  const pts = located.map(o => proj(o.h.lat, o.h.lon));
+  const k = baseMap(m);
+  const r = 9 * k, shown = spread(pts, r);
+  located.forEach((o, n) => {
+    const [x0, y0] = pts[n], [x, y] = shown[n], h = o.h;
+    if (Math.hypot(x - x0, y - y0) > r * 0.4) {
+      m.append(el("line", { x1: x0, y1: y0, x2: x, y2: y, stroke: "var(--accent)", "stroke-width": 1.5 * k }));
+      m.append(el("circle", { cx: x0, cy: y0, r: 3 * k, fill: "var(--accent)" }));
+    }
+    const g = el("g", { class: "pin", tabindex: "0", role: "button", "aria-label": `${h.tag}. ${h.name}` });
+    g.append(el("title", {}, `${h.tag}. ${h.name}`));
+    g.append(el("circle", { class: "dot", cx: x, cy: y, r, "stroke-width": 2.5 * k }), el("text", { class: "n", x, y: y + 4.5 * k, "text-anchor": "middle", style: `font-size:${13 * k}px` }, h.tag));
+    g.addEventListener("click", () => openHouse(h.id));
+    g.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); openHouse(h.id); } });
+    m.append(g);
+  });
+  const lg = $("legend"); lg.replaceChildren();
+  list.forEach(h => {
+    const li = document.createElement("li"); const b = document.createElement("button"); b.type = "button";
+    const kk = document.createElement("span"); kk.className = "k"; kk.textContent = h.tag;
+    const t = document.createElement("span"); t.className = "t"; t.textContent = h.name;
+    const sub = document.createElement("span"); sub.className = "s"; sub.textContent = h.lat == null ? "Pas de position sur la carte" : h.place;
+    t.append(sub); b.append(kk, t); b.onclick = () => openHouse(h.id); li.append(b); lg.append(li);
+  });
+}
+
+/* ---------- detail ---------- */
+function openHouse(id) {
+  const h = byId(id); if (!h) return;
+  openId = id; pending = null; deleteArm = null; delPlaceArm = false;
+  const hero = $("dHero"); hero.replaceChildren(); hero.classList.toggle("static", !h.photos.length);
+  if (h.photos.length) {
+    const im = document.createElement("img"); im.src = h.photos[0]; im.alt = h.name; hero.append(im);
+    const m = document.createElement("span"); m.className = "more-ph";
+    m.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>';
+    m.append(`Voir les ${h.photos.length} photos`); hero.append(m);
+    hero.setAttribute("aria-label", `Voir les ${h.photos.length} photos de ${h.name}`);
+  } else { hero.append(ph(h)); hero.removeAttribute("aria-label"); }
+  $("dTag").textContent = `${h.tag} · ${h.kind}`;
+  $("dTitle").textContent = h.name;
+  const pl = $("dPlace"); pl.replaceChildren(h.place + " · ");
+  const a = document.createElement("a"); a.href = h.url; a.target = "_blank"; a.rel = "noopener"; a.textContent = "Voir l'annonce ↗"; pl.append(a);
+  const spec = [];
+  if (h.price) { spec.push(["Prix total", eur(h.price), h.priceNote], ["Par personne", eur(Math.round(h.price / GROUP)), "pour " + GROUP]); }
+  if (h.cap) spec.push(["Capacité", h.cap + " pers."]);
+  if (h.rooms) spec.push(["Chambres", String(h.rooms)]);
+  if (h.size) spec.push(["Surface", h.size]);
+  if (h.paris !== "?") spec.push(["Depuis Paris", h.paris]);
+  if (h.bordeaux !== "?") spec.push(["Depuis Bordeaux", h.bordeaux]);
+  const dl = $("dSpec"); dl.replaceChildren(); dl.hidden = !spec.length;
+  for (const [k, v, small] of spec) {
+    const d = document.createElement("div"); const dt = document.createElement("dt"); dt.textContent = k;
+    const dd = document.createElement("dd"); dd.textContent = v;
+    if (small) { const sm = document.createElement("small"); sm.textContent = " " + small; dd.append(sm); }
+    d.append(dt, dd); dl.append(d);
+  }
+  const say = $("dSay"); say.replaceChildren();
+  if (h.pending) { const pe = document.createElement("p"); pe.className = "quote"; pe.textContent = "Lieu ajouté avec son lien seulement. Paul complète bientôt le prix, les chambres, les trajets et les photos ; en attendant, ouvre l'annonce."; say.append(pe); }
+  if (h.points.length || h.paul) {
+    const h3 = document.createElement("h3"); h3.textContent = h.added ? `Le mot de ${h.by || "la personne qui l'a ajouté"}` : "À savoir"; say.append(h3);
+    if (h.points.length) { const ul = document.createElement("ul"); h.points.forEach(p => { const li = document.createElement("li"); li.textContent = p; ul.append(li); }); say.append(ul); }
+    if (h.paul) { const q = document.createElement("p"); q.className = "quote"; const b = document.createElement("b"); b.textContent = "Paul : "; q.append(b, h.paul); say.append(q); }
+  }
+  $("cText").value = ""; $("cErr").hidden = true; $("gate").hidden = true;
+  renderDetail();
+  if (!$("dlg").open) $("dlg").showModal();
+  $("dlg").scrollTop = 0;
+  if (location.hash !== "#" + id) history.replaceState(null, "", "#" + id);
+}
+let galPhotos = [], bigI = 0;
+function openGallery() {
+  const h = byId(openId); if (!h?.photos.length) return;
+  galPhotos = h.photos;
+  $("gTitle").textContent = h.name; $("gN").textContent = `${h.photos.length} photos`;
+  $("gGrid").replaceChildren(...h.photos.map((p, i) => {
+    const b = document.createElement("button"); b.type = "button"; b.setAttribute("aria-label", `Agrandir la photo ${i + 1}`);
+    const im = document.createElement("img"); im.src = p; im.alt = ""; im.loading = i < 12 ? "eager" : "lazy"; im.decoding = "async";
+    b.append(im); b.onclick = () => showBig(i); return b;
+  }));
+  $("big").hidden = true;
+  $("galDlg").showModal(); $("galDlg").scrollTop = 0;
+}
+function showBig(i) {
+  bigI = Math.max(0, Math.min(i, galPhotos.length - 1));
+  $("bImg").src = galPhotos[bigI];
+  $("bCount").textContent = `${bigI + 1} / ${galPhotos.length}`;
+  $("bPrev").disabled = bigI === 0; $("bNext").disabled = bigI === galPhotos.length - 1;
+  $("big").hidden = false; $("bClose").focus();
+}
+$("dHero").onclick = openGallery;
+$("gClose").onclick = () => $("galDlg").close();
+$("bClose").onclick = () => { $("big").hidden = true; };
+$("bPrev").onclick = () => showBig(bigI - 1);
+$("bNext").onclick = () => showBig(bigI + 1);
+$("big").addEventListener("click", e => { if (e.target === $("big")) $("big").hidden = true; });
+$("galDlg").addEventListener("cancel", e => { if (!$("big").hidden) { e.preventDefault(); $("big").hidden = true; } });
+$("galDlg").addEventListener("keydown", e => { if ($("big").hidden) return; if (e.key === "ArrowLeft") showBig(bigI - 1); if (e.key === "ArrowRight") showBig(bigI + 1); });
+function closeHouse() { if ($("dlg").open) $("dlg").close(); }
+$("dlg").addEventListener("close", () => { openId = null; pending = null; if (location.hash) history.replaceState(null, "", location.pathname + location.search); });
+$("closeBtn").onclick = closeHouse;
+$("dlg").addEventListener("click", e => { if (e.target === $("dlg")) closeHouse(); });
+
+function renderDetail() {
+  if (!openId) return;
+  const h = byId(openId);
+  if (!h) { closeHouse(); return; }
+  const t = tallies(openId);
+  const mine = votes[voterKey]?.v?.[openId] || 0;
+  const up = $("vUp"), down = $("vDown");
+  up.innerHTML = `${I_UP}<span>Pour</span><span class="n">${t.up}</span>`;
+  down.innerHTML = `${I_DOWN}<span>Contre</span><span class="n">${t.down}</span>`;
+  up.setAttribute("aria-pressed", String(mine === 1));
+  down.setAttribute("aria-pressed", String(mine === -1));
+  up.disabled = down.disabled = !canWrite;
+  const v = $("dVoters"); v.replaceChildren();
+  const line = (label, names) => { if (!names.length) return; const d = document.createElement("div"); const b = document.createElement("b"); b.textContent = label + " : "; d.append(b, names.join(", ")); v.append(d); };
+  line("Pour", t.ups); line("Contre", t.downs);
+
+  const del = $("dDel");
+  const mayDel = canWrite && h.added && (isOwner || (h.voter && h.voter === voterKey));
+  del.hidden = !mayDel;
+  del.textContent = delPlaceArm ? "Confirmer : retirer ce lieu de la page" : "Retirer ce lieu";
+
+  const list = $("dComments"); list.replaceChildren();
+  const mineList = comments.filter(c => c.house === openId).sort((a, b) => String(a.at).localeCompare(String(b.at)));
+  for (const c of mineList) {
+    const row = document.createElement("div"); row.className = "cmt";
+    const av = document.createElement("div"); av.className = "av"; av.textContent = (c.name || "?").trim().charAt(0).toUpperCase();
+    const bub = document.createElement("div"); bub.className = "bubble";
+    const who = document.createElement("div"); who.className = "who";
+    const n = document.createElement("span"); n.textContent = c.name || "Quelqu'un";
+    const w = document.createElement("span"); w.className = "when"; w.textContent = when(c.at);
+    who.append(n, w);
+    if (canWrite && ((c.voter && c.voter === voterKey) || isOwner)) {
+      const d = document.createElement("button"); d.type = "button"; d.className = "del";
+      d.textContent = deleteArm === c.id ? "Confirmer la suppression" : "Supprimer";
+      d.onclick = () => deleteComment(c.id);
+      who.append(d);
+    }
+    const p = document.createElement("p"); p.textContent = c.text;
+    bub.append(who, p); row.append(av, bub); list.append(row);
+  }
+  $("compose").hidden = !canWrite;
+  renderAs();
+}
+$("dDel").onclick = async () => {
+  const h = byId(openId); if (!h?.added) return;
+  if (!delPlaceArm) { delPlaceArm = true; renderDetail(); return; }
+  try { await db.collection("places").doc(h.docId).delete(); closeHouse(); } catch (e) { writeErr(e); }
+};
+function renderAs() {
+  const a = $("asWho"); a.replaceChildren();
+  if (!myName) return;
+  a.append("Publié en tant que ");
+  const b = document.createElement("b"); b.textContent = myName; a.append(b, " · ");
+  const ch = document.createElement("button"); ch.type = "button"; ch.textContent = "changer";
+  ch.onclick = () => { $("gate").hidden = false; $("cName").value = myName; $("cName").focus(); };
+  a.append(ch);
+}
+function when(iso) {
+  const d = new Date(iso || ""); if (isNaN(d)) return "";
+  const s = (Date.now() - d) / 1000;
+  if (s < 60) return "à l'instant";
+  if (s < 3600) return `il y a ${Math.floor(s / 60)} min`;
+  if (s < 86400) return `il y a ${Math.floor(s / 3600)} h`;
+  return d.toLocaleDateString("fr-FR", { day: "numeric", month: "short" });
+}
+
+/* ---------- name gate ---------- */
+function needName(action) {
+  if (myName) return false;
+  pending = action;
+  $("gate").hidden = false;
+  $("cErr").hidden = true;
+  $("cName").focus();
+  $("gate").scrollIntoView({ block: "center", behavior: "smooth" });
+  return true;
+}
+function saveName(n) {
+  myName = n.trim().slice(0, 40);
+  try { localStorage.setItem("opg-name", myName); } catch {}
+  if (db && votes[voterKey]) db.collection("votes").doc(voterKey).update({ name: myName }).catch(() => {});
+}
+function showErr(msg, id = "cErr") { $(id).textContent = msg; $(id).hidden = false; }
+function writeErr(e, id = "cErr") {
+  if (e?.code === "not_granted") {
+    showErr("La page n'arrive pas à enregistrer. Préviens Paul.", id);
+  } else if (e?.code === "quota_exceeded") showErr("La page est pleine. Préviens Paul.", id);
+  else showErr("Ça n'est pas passé. Vérifie ta connexion et réessaie.", id);
+}
+
+/* ---------- votes ---------- */
+async function castVote(val) {
+  if (!canWrite || !openId) return;
+  const hid = openId;
+  if (needName(() => castVote(val))) { showErr("Indique ton prénom ci-dessous, puis appuie sur Publier."); return; }
+  const cur = votes[voterKey]?.v?.[hid] || 0;
+  const next = cur === val ? 0 : val;
+  const body = { name: myName, v: { ...(votes[voterKey]?.v || {}) }, at: new Date().toISOString() };
+  if (next) body.v[hid] = next; else delete body.v[hid];
+  try { await db.collection("votes").doc(voterKey).set(body); } catch (e) { writeErr(e); }
+}
+$("vUp").onclick = () => castVote(1);
+$("vDown").onclick = () => castVote(-1);
+
+/* ---------- comments ---------- */
+$("compose").onsubmit = async ev => {
+  ev.preventDefault();
+  $("cErr").hidden = true;
+  if (!$("gate").hidden) {
+    const n = $("cName").value.trim();
+    if (!n) { showErr("Ajoute ton prénom pour publier."); $("cName").focus(); return; }
+    saveName(n); $("gate").hidden = true; renderAs();
+    if (pending) { const p = pending; pending = null; await p(); if (!$("cText").value.trim()) return; }
+  }
+  const text = $("cText").value.trim();
+  if (!text) { if (!myName) needName(null); else showErr("Écris un commentaire avant de publier."); return; }
+  if (needName(null)) return;
+  $("cSend").disabled = true;
+  try {
+    await db.collection("comments").add({ house: openId, name: myName, text, at: new Date().toISOString(), voter: voterKey });
+    $("cText").value = "";
+  } catch (e) { writeErr(e); }
+  finally { $("cSend").disabled = false; }
+};
+async function deleteComment(id) {
+  if (deleteArm !== id) { deleteArm = id; renderDetail(); return; }
+  deleteArm = null;
+  try { await db.collection("comments").doc(id).delete(); } catch (e) { writeErr(e); }
+}
+
+/* ---------- add a place ---------- */
+function renderPick() {
+  const m = $("pickMap"); baseMap(m);
+  places().forEach(h => { if (h.lat == null) return; const [x, y] = proj(h.lat, h.lon); m.append(el("circle", { cx: x, cy: y, r: 6, fill: "var(--muted)", opacity: ".5" })); });
+  if (pickPos) {
+    const [x, y] = proj(pickPos[0], pickPos[1]); const g = el("g", { class: "pin" });
+    g.append(el("circle", { class: "dot", cx: x, cy: y, r: 12 })); m.append(g);
+    $("aPinHint").textContent = "Position placée. Touche ailleurs pour la déplacer.";
+  } else $("aPinHint").textContent = "Touche la carte à peu près à l'endroit du lieu. Sans position, il n'apparaîtra pas sur la carte.";
+}
+$("pickMap").addEventListener("click", e => {
+  const m = $("pickMap"); const pt = m.createSVGPoint(); pt.x = e.clientX; pt.y = e.clientY;
+  const ctm = m.getScreenCTM(); if (!ctm) return;
+  const p = pt.matrixTransform(ctm.inverse());
+  const [lat, lon] = unproj(p.x, p.y);
+  if (lat < 41 || lat > 52 || lon < -6 || lon > 10) return;
+  pickPos = [Math.round(lat * 1000) / 1000, Math.round(lon * 1000) / 1000];
+  renderPick();
+});
+function openAdd() {
+  $("aForm").reset(); $("aMore").open = false; pickPos = null; $("aErr").hidden = true;
+  $("aWho").value = myName;
+  renderPick();
+  $("addDlg").showModal(); $("addDlg").scrollTop = 0;
+  $("aUrl").focus();
+}
+$("addBtn").onclick = openAdd;
+$("aCancel").onclick = () => $("addDlg").close();
+$("aClose").onclick = () => $("addDlg").close();
+$("addDlg").addEventListener("click", e => { if (e.target === $("addDlg")) $("addDlg").close(); });
+$("aForm").onsubmit = async ev => {
+  ev.preventDefault(); $("aErr").hidden = true;
+  const url = safeUrl($("aUrl").value.trim());
+  const name = $("aName").value.trim();
+  const who = $("aWho").value.trim();
+  const price = num($("aPrice").value);
+  if (!url) return showErr("Colle le lien complet de l'annonce, qui commence par https://", "aErr"), $("aUrl").focus();
+  if (!who) return showErr("Ajoute ton prénom pour publier.", "aErr"), $("aWho").focus();
+  if (who !== myName) saveName(who);
+  const body = { url, name, town: $("aTown").value.trim(), price, cap: num($("aCap").value), rooms: num($("aRooms").value),
+    paris: $("aParis").value.trim(), bordeaux: $("aBdx").value.trim(), note: $("aNote").value.trim(),
+    by: myName, voter: voterKey, at: new Date().toISOString() };
+  if (pickPos) { body.lat = pickPos[0]; body.lon = pickPos[1]; }
+  $("aSave").disabled = true;
+  try {
+    const ref = await db.collection("places").add(body);
+    $("addDlg").close();
+    if (ref?.id) setTimeout(() => openHouse("p-" + ref.id), 300);
+  } catch (e) { writeErr(e, "aErr"); }
+  finally { $("aSave").disabled = false; }
+};
+
+/* ---------- boot ---------- */
+function showNotice() {
+  const n = $("notice");
+  $("addBtn").hidden = !canWrite;
+  if (canWrite) { n.hidden = true; return; }
+  n.hidden = false;
+  n.textContent = db
+    ? "Tu peux consulter les votes et les commentaires. Pour voter, commenter et ajouter un lieu, demande à Paul de t'inviter sur cette page."
+    : "Connecte-toi à claude.ai avec l'invitation de Paul pour voir les votes, voter, commenter et ajouter un lieu.";
+}
+function route() {
+  const id = location.hash.slice(1);
+  if (byId(id)) openHouse(id); else if (!id && $("dlg").open) closeHouse();
+}
+window.addEventListener("hashchange", route);
+
+renderGrid();
+route();
+
+/* ---------- shared store (Supabase REST) ---------- */
+const SB_URL = "https://doxkcbxlvycvjpnuemkc.supabase.co", SB_KEY = "sb_publishable_JTlbyfrV3Z70ldKElQ-9qg_ZEDC1MgG";
+function makeDb() {
+  const H = { apikey: SB_KEY, "Content-Type": "application/json" };
+  const base = SB_URL.replace(/\/$/, "") + "/rest/v1/docs";
+  const subs = {};
+  const rid = () => Math.random().toString(36).slice(2, 12) + Date.now().toString(36);
+  async function req(url, opts = {}) {
+    const r = await fetch(url, { ...opts, headers: { ...H, ...(opts.headers || {}) } });
+    if (!r.ok) { const e = new Error("HTTP " + r.status); e.code = r.status === 401 || r.status === 403 ? "not_granted" : "unavailable"; throw e; }
+    return r.status === 204 ? null : r.json().catch(() => null);
+  }
+  async function refresh(col) {
+    const s = subs[col]; if (!s) return;
+    try {
+      const rows = await req(`${base}?collection=eq.${col}&select=id,data&order=updated_at.asc`);
+      const docs = rows.map(r => ({ id: r.id, data: () => r.data }));
+      s.forEach(([ok]) => ok({ docs }));
+    } catch (e) { s.forEach(([, bad]) => bad && bad(e)); }
+  }
+  const upsert = (col, id, data) => req(base, { method: "POST", headers: { Prefer: "resolution=merge-duplicates,return=minimal" }, body: JSON.stringify({ collection: col, id, data, updated_at: new Date().toISOString() }) }).then(() => refresh(col));
+  setInterval(() => { if (!document.hidden) Object.keys(subs).forEach(refresh); }, 10000);
+  document.addEventListener("visibilitychange", () => { if (!document.hidden) Object.keys(subs).forEach(refresh); });
+  return {
+    collection(col) {
+      return {
+        onSnapshot(ok, bad) { (subs[col] ||= []).push([ok, bad]); refresh(col); return () => {}; },
+        async add(data) { const id = rid(); await upsert(col, id, data); return { id }; },
+        doc(id) {
+          return {
+            set: data => upsert(col, id, data),
+            async update(patch) {
+              const rows = await req(`${base}?collection=eq.${col}&id=eq.${encodeURIComponent(id)}&select=data`);
+              return upsert(col, id, { ...(rows[0]?.data || {}), ...patch });
+            },
+            delete: () => req(`${base}?collection=eq.${col}&id=eq.${encodeURIComponent(id)}`, { method: "DELETE" }).then(() => refresh(col)),
+          };
+        },
+      };
+    },
+  };
+}
+
+(() => {
+  if (location.hash === "#paul-admin") { try { localStorage.setItem("opg-admin", "1"); } catch {} history.replaceState(null, "", location.pathname); }
+  try { isOwner = localStorage.getItem("opg-admin") === "1"; } catch {}
+  db = makeDb();
+  canWrite = true;
+  try { voterKey = localStorage.getItem("opg-voter"); } catch {}
+  if (!voterKey) { voterKey = "v" + Math.random().toString(36).slice(2, 12) + Date.now().toString(36); try { localStorage.setItem("opg-voter", voterKey); } catch {} }
+  showNotice();
+  db.collection("votes").onSnapshot(snap => {
+    votes = Object.fromEntries(snap.docs.map(d => [d.id, d.data()]));
+    renderGrid(); renderDetail();
+  }, () => {});
+  db.collection("comments").onSnapshot(snap => {
+    comments = snap.docs.map(d => ({ id: d.id, ...d.data() })).filter(c => typeof c.house === "string" && typeof c.text === "string");
+    renderGrid(); renderDetail();
+  }, () => {});
+  db.collection("places").onSnapshot(snap => {
+    added = snap.docs.map(fromDoc).filter(Boolean).sort((a, b) => String(a.at).localeCompare(String(b.at)));
+    renderGrid(); renderDetail();
+    if (!openId) route();
+  }, () => {});
+  renderDetail();
+})();
+</script>
+
+</body>
+</html>
