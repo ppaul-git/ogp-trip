@@ -56,6 +56,7 @@ h1 .dot { color: var(--colza); }
 .notice { border: 1px dashed var(--line); border-radius: 12px; padding: 12px 14px; color: var(--muted); font-size: 14px; background: var(--surface); }
 
 .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 230px), 1fr)); gap: 16px; }
+
 .tile { position: relative; display: flex; flex-direction: column; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; cursor: pointer; text-align: left; padding: 0; font: inherit; color: inherit; transition: border-color .15s, box-shadow .15s, transform .15s; }
 .tile:hover { border-color: var(--muted); box-shadow: 0 8px 24px var(--shade); }
 .tile:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
@@ -220,6 +221,17 @@ textarea:focus-visible, input:focus-visible, button:focus-visible, a:focus-visib
 .err { color: var(--down); font-size: 13px; margin: 0; }
 
 @media (prefers-reduced-motion: reduce) { .tile, .photo img { transition: none; } .tile:hover .photo img { transform: none; } }
+@media (max-width: 560px) {
+  .grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+  .tbody { padding: 8px 9px 10px; gap: 6px; }
+  .tname { font-size: 14.5px; }
+  .tplace { font-size: 11.5px; }
+  .facts { font-size: 11.5px; gap: 1px 8px; }
+  .tally { gap: 4px; flex-wrap: wrap; }
+  .count { padding: 2px 6px; font-size: 11px; }
+  .count svg { width: 11px; height: 11px; }
+  .tag { top: 6px; left: 6px; font-size: 9.5px; padding: 3px 7px; }
+}
 </style>
 </head>
 <body>
