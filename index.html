@@ -83,7 +83,30 @@ h1 .dot { color: var(--colza); }
 .ph span { font-family: var(--f-mono); font-size: 11px; color: var(--muted); }
 .by { font-size: 12px; color: var(--muted); }
 
-.toolbar { display: flex; justify-content: flex-end; margin-top: -8px; }
+.ballot { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 18px; display: grid; gap: 14px; }
+.bhead h2 { font-family: var(--f-display); font-size: 22px; margin: 0; }
+.bhead p { margin: 4px 0 0; color: var(--muted); font-size: 14px; }
+#bForm { display: grid; gap: 12px; }
+.brow { border: 0; padding: 0; margin: 0; display: grid; gap: 6px; min-width: 0; }
+.brow legend { font-size: 13px; font-weight: 600; padding: 0; margin-bottom: 6px; }
+.bchips { display: flex; flex-wrap: wrap; gap: 6px; }
+.bchip { display: inline-flex; align-items: center; gap: 6px; border: 1.5px solid var(--line); background: var(--surface); color: var(--fg); border-radius: 999px; padding: 6px 12px 6px 6px; font: inherit; font-size: 13.5px; cursor: pointer; max-width: 100%; }
+.bchip .k { width: 22px; height: 22px; border-radius: 50%; background: var(--bg); color: var(--fg); display: grid; place-items: center; font-size: 12px; font-weight: 700; flex: none; }
+.bchip span.t { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.bchip[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); font-weight: 600; }
+.bchip[aria-pressed="true"] .k { background: var(--accent); color: var(--accent-fg); }
+.bchip:disabled { opacity: .4; cursor: not-allowed; }
+.bfoot { display: flex; flex-wrap: wrap; gap: 10px; align-items: end; }
+.bname { flex: 1 1 180px; }
+.bok { margin: 0; font-size: 14px; color: var(--up); font-weight: 600; }
+.bvoters { font-size: 13.5px; color: var(--muted); border-top: 1px solid var(--line); padding-top: 12px; }
+.bvoters b { color: var(--fg); }
+.bvoters .names { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+.bvoters .names span { background: var(--bg); color: var(--fg); border-radius: 999px; padding: 3px 10px; font-size: 13px; }
+.bres { border-top: 1px solid var(--line); padding-top: 12px; display: grid; gap: 6px; font-size: 14px; }
+.bres .row { display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 10px; }
+.bres .row b { font-variant-numeric: tabular-nums; }
+.bres .adm { font-size: 12px; color: var(--muted); }
 .addbtn { display: inline-flex; align-items: center; gap: 6px; border: 1.5px dashed var(--accent); background: transparent; color: var(--accent); border-radius: 999px; padding: 6px 14px; font: inherit; font-size: 14px; font-weight: 600; cursor: pointer; }
 .addbtn:hover { background: var(--accent-soft); }
 .addbtn svg { width: 16px; height: 16px; }
@@ -243,9 +266,25 @@ textarea:focus-visible, input:focus-visible, button:focus-visible, a:focus-visib
     <h1>OGP Trip<span class="dot">.</span> On dort où&nbsp;?</h1>
   </header>
 
-  <div class="toolbar">
-    <button type="button" class="addbtn" id="addBtn" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Ajouter un lieu</button>
-  </div>
+  <section class="ballot" id="ballot" aria-labelledby="bH">
+    <div class="bhead">
+      <h2 id="bH">Vote final</h2>
+      <p>Choisis ta maison préférée et ta deuxième. Les résultats restent cachés jusqu'à la fin du vote.</p>
+    </div>
+    <form id="bForm" novalidate>
+      <fieldset class="brow"><legend>Mon premier choix</legend><div class="bchips" id="bFirst"></div></fieldset>
+      <fieldset class="brow"><legend>Mon deuxième choix</legend><div class="bchips" id="bSecond"></div></fieldset>
+      <div class="bfoot">
+        <div class="field bname"><label for="bName">Ton prénom</label><input type="text" id="bName" maxlength="40" autocomplete="given-name" placeholder="Prénom"></div>
+        <button type="submit" class="btn" id="bSend">Valider mon vote</button>
+      </div>
+      <p class="err" id="bErr" hidden></p>
+      <p class="bok" id="bOk" hidden></p>
+    </form>
+    <div class="bvoters" id="bVoters"></div>
+    <div class="bres" id="bRes" hidden></div>
+  </section>
+  <button type="button" class="addbtn" id="addBtn" hidden>Ajouter un lieu</button>
   <div class="notice" id="notice" hidden></div>
 
   <main class="grid" id="grid"></main>
@@ -467,6 +506,7 @@ function tileEl(h) {
   return b;
 }
 function renderGrid() {
+  if (typeof renderBallot === "function" && $("bFirst")) try { renderBallot(); } catch {}
   $("grid").replaceChildren(...places().map(tileEl));
   renderMap();
 }
@@ -858,10 +898,88 @@ $("aForm").onsubmit = async ev => {
   finally { $("aSave").disabled = false; }
 };
 
+/* ---------- final ballot (stored in "votes" with id "ballot-<voter>") ---------- */
+let bFirst = null, bSecond = null, bEditing = false;
+function ballots() {
+  const byName = new Map();
+  for (const [id, d] of Object.entries(votes)) {
+    if (!id.startsWith("ballot-") || !d || typeof d.name !== "string" || !d.name.trim()) continue;
+    const key = d.name.trim().toLowerCase();
+    const prev = byName.get(key);
+    if (!prev || String(d.at) > String(prev.at)) byName.set(key, { id, ...d });
+  }
+  return [...byName.values()].sort((a, b) => String(a.at).localeCompare(String(b.at)));
+}
+function myBallot() { const d = votes["ballot-" + voterKey]; return d && d.first ? d : null; }
+function chips(box, pick, other, set) {
+  box.replaceChildren(...places().map(h => {
+    const b = document.createElement("button"); b.type = "button"; b.className = "bchip";
+    b.setAttribute("aria-pressed", String(pick === h.id)); b.disabled = other === h.id;
+    const k = document.createElement("span"); k.className = "k"; k.textContent = h.tag;
+    const t = document.createElement("span"); t.className = "t"; t.textContent = h.name;
+    b.append(k, t); b.onclick = () => { set(pick === h.id ? null : h.id); renderBallot(); };
+    return b;
+  }));
+}
+function renderBallot() {
+  const ids = new Set(places().map(h => h.id));
+  if (bFirst && !ids.has(bFirst)) bFirst = null;
+  if (bSecond && !ids.has(bSecond)) bSecond = null;
+  const mine = myBallot();
+  if (mine && !bEditing) {
+    const n1 = byId(mine.first)?.name || "?", n2 = byId(mine.second)?.name || "?";
+    $("bForm").hidden = true; $("bOk").hidden = true;
+    let done = $("bDone"); if (!done) { done = document.createElement("div"); done.id = "bDone"; done.className = "bok"; $("bForm").after(done); }
+    done.hidden = false; done.replaceChildren(`C'est noté, ${mine.name} : 1er ${n1}, 2e ${n2}. `);
+    const ch = document.createElement("button"); ch.type = "button"; ch.className = "delplace"; ch.style.color = "var(--accent)"; ch.textContent = "Modifier mon vote";
+    ch.onclick = () => { bEditing = true; bFirst = mine.first; bSecond = mine.second; renderBallot(); };
+    done.append(ch);
+  } else {
+    $("bForm").hidden = false; const done = $("bDone"); if (done) done.hidden = true;
+    chips($("bFirst"), bFirst, bSecond, v => bFirst = v);
+    chips($("bSecond"), bSecond, bFirst, v => bSecond = v);
+    if (!$("bName").value && myName) $("bName").value = myName;
+  }
+  const list = ballots(), vb = $("bVoters"); vb.replaceChildren();
+  const head = document.createElement("div");
+  const b = document.createElement("b"); b.textContent = list.length;
+  head.append(b, list.length > 1 ? " personnes ont voté" : list.length === 1 ? " personne a voté" : " vote pour l'instant");
+  vb.append(head);
+  if (list.length) { const ns = document.createElement("div"); ns.className = "names"; list.forEach(x => { const sp = document.createElement("span"); sp.textContent = x.name; ns.append(sp); }); vb.append(ns); }
+  const res = $("bRes");
+  if (isOwner && list.length) {
+    res.hidden = false; res.replaceChildren();
+    const sc = new Map(places().map(h => [h.id, { h, pts: 0, f: 0, s: 0 }]));
+    list.forEach(x => { const a = sc.get(x.first), c = sc.get(x.second); if (a) { a.pts += 2; a.f++; } if (c) { c.pts += 1; c.s++; } });
+    const adm = document.createElement("div"); adm.className = "adm"; adm.textContent = "Visible uniquement en mode admin · 2 points pour un 1er choix, 1 point pour un 2e";
+    res.append(adm);
+    [...sc.values()].sort((a, b) => b.pts - a.pts || b.f - a.f).forEach(o => {
+      const r = document.createElement("div"); r.className = "row";
+      const n = document.createElement("span"); n.textContent = `${o.h.tag} · ${o.h.name} (${o.f}× 1er, ${o.s}× 2e)`;
+      const p = document.createElement("b"); p.textContent = o.pts + " pts";
+      r.append(n, p); res.append(r);
+    });
+  } else res.hidden = true;
+}
+$("bForm").onsubmit = async ev => {
+  ev.preventDefault(); $("bErr").hidden = true;
+  const name = $("bName").value.trim();
+  if (!bFirst) return showErr("Choisis ta maison préférée.", "bErr");
+  if (!bSecond) return showErr("Choisis aussi ton deuxième choix.", "bErr");
+  if (!name) { showErr("Ajoute ton prénom pour valider.", "bErr"); $("bName").focus(); return; }
+  if (name !== myName) saveName(name);
+  $("bSend").disabled = true;
+  try {
+    await db.collection("votes").doc("ballot-" + voterKey).set({ name, first: bFirst, second: bSecond, at: new Date().toISOString() });
+    bEditing = false;
+  } catch (e) { writeErr(e, "bErr"); }
+  finally { $("bSend").disabled = false; }
+};
+
 /* ---------- boot ---------- */
 function showNotice() {
   const n = $("notice");
-  $("addBtn").hidden = !canWrite;
+  $("addBtn").hidden = true;
   if (canWrite) { n.hidden = true; return; }
   n.hidden = false;
   n.textContent = db
