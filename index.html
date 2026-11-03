@@ -99,6 +99,8 @@ h1 .dot { color: var(--colza); }
 .bfoot { display: flex; flex-wrap: wrap; gap: 10px; align-items: end; }
 .bname { flex: 1 1 180px; }
 .bok { margin: 0; font-size: 14px; color: var(--up); font-weight: 600; }
+#bDone { display: grid; gap: 10px; justify-items: start; }
+.bedit { font-size: 14px; padding: 8px 16px; }
 .bvoters { font-size: 13.5px; color: var(--muted); border-top: 1px solid var(--line); padding-top: 12px; }
 .bvoters b { color: var(--fg); }
 .bvoters .names { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
@@ -930,8 +932,8 @@ function renderBallot() {
     const n1 = byId(mine.first)?.name || "?", n2 = byId(mine.second)?.name || "?";
     $("bForm").hidden = true; $("bOk").hidden = true;
     let done = $("bDone"); if (!done) { done = document.createElement("div"); done.id = "bDone"; done.className = "bok"; $("bForm").after(done); }
-    done.hidden = false; done.replaceChildren(`C'est noté, ${mine.name} : 1er ${n1}, 2e ${n2}. `);
-    const ch = document.createElement("button"); ch.type = "button"; ch.className = "delplace"; ch.style.color = "var(--accent)"; ch.textContent = "Modifier mon vote";
+    done.hidden = false; const msg = document.createElement("span"); msg.textContent = `✓ C'est noté, ${mine.name} : 🥇 ${n1}, 🥈 ${n2}`; done.replaceChildren(msg);
+    const ch = document.createElement("button"); ch.type = "button"; ch.className = "btn ghost bedit"; ch.textContent = "Modifier mon vote";
     ch.onclick = () => { bEditing = true; bFirst = mine.first; bSecond = mine.second; renderBallot(); };
     done.append(ch);
   } else {
