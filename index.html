@@ -99,6 +99,10 @@ h1 .dot { color: var(--colza); }
 .bfoot { display: flex; flex-wrap: wrap; gap: 10px; align-items: end; }
 .bname { flex: 1 1 180px; }
 .bok { margin: 0; font-size: 14px; color: var(--up); font-weight: 600; }
+.fab { display: flex; gap: 14px; align-items: center; background: var(--accent-soft); border-radius: 12px; padding: 10px; }
+.fab img { width: 92px; height: 120px; object-fit: cover; object-position: 50% 30%; border-radius: 10px; flex: none; transform: rotate(-3deg); box-shadow: 0 2px 8px rgba(0,0,0,.15); }
+.fab p { margin: 0; font-size: 15px; line-height: 1.4; }
+.fab p b { font-family: var(--f-display); font-size: 19px; display: block; margin-bottom: 2px; }
 #bDone { display: grid; gap: 10px; justify-items: start; }
 .bedit { font-size: 14px; padding: 8px 16px; }
 .bvoters { font-size: 13.5px; color: var(--muted); border-top: 1px solid var(--line); padding-top: 12px; }
@@ -271,11 +275,13 @@ textarea:focus-visible, input:focus-visible, button:focus-visible, a:focus-visib
   <section class="ballot" id="ballot" aria-labelledby="bH">
     <div class="bhead">
       <h2 id="bH">Vote final</h2>
-      <p>Choisis ta maison préférée et ta deuxième. Les résultats restent cachés jusqu'à la fin du vote.</p>
+      <p>Nouveau tour : classe tes 3 maisons préférées. Les votes précédents ne comptent plus. Les résultats restent cachés jusqu'à la fin du vote.</p>
     </div>
+    <div class="fab"><img src="img/fabien.jpg" alt="Fabien, tout sourire dans un hamac"><p><b>Vous pensiez en avoir fini&nbsp;?</b>Fabien, lui, non. Il ajoute la maison n°4.</p></div>
     <form id="bForm" novalidate>
       <fieldset class="brow"><legend>🥇 Mon premier choix</legend><div class="bchips" id="bFirst"></div></fieldset>
       <fieldset class="brow"><legend>🥈 Mon deuxième choix</legend><div class="bchips" id="bSecond"></div></fieldset>
+      <fieldset class="brow"><legend>🥉 Mon troisième choix</legend><div class="bchips" id="bThird"></div></fieldset>
       <div class="bfoot">
         <div class="field bname"><label for="bName">Ton prénom</label><input type="text" id="bName" maxlength="40" autocomplete="given-name" placeholder="Prénom"></div>
         <button type="submit" class="btn" id="bSend">Valider mon vote</button>
@@ -900,23 +906,24 @@ $("aForm").onsubmit = async ev => {
   finally { $("aSave").disabled = false; }
 };
 
-/* ---------- final ballot (stored in "votes" with id "ballot-<voter>") ---------- */
-let bFirst = null, bSecond = null, bEditing = false;
+/* ---------- final ballot (stored in "votes" with id "final2-<voter>"; old "ballot-" ids ignored) ---------- */
+let bFirst = null, bSecond = null, bThird = null, bEditing = false;
 function ballots() {
   const byName = new Map();
   for (const [id, d] of Object.entries(votes)) {
-    if (!id.startsWith("ballot-") || !d || typeof d.name !== "string" || !d.name.trim()) continue;
+    if (!id.startsWith(BP) || !d || typeof d.name !== "string" || !d.name.trim()) continue;
     const key = d.name.trim().toLowerCase();
     const prev = byName.get(key);
     if (!prev || String(d.at) > String(prev.at)) byName.set(key, { id, ...d });
   }
   return [...byName.values()].sort((a, b) => String(a.at).localeCompare(String(b.at)));
 }
-function myBallot() { const d = votes["ballot-" + voterKey]; return d && d.first ? d : null; }
+const BP = "final2-";
+function myBallot() { const d = votes[BP + voterKey]; return d && d.first ? d : null; }
 function chips(box, pick, other, set) {
   box.replaceChildren(...places().map(h => {
     const b = document.createElement("button"); b.type = "button"; b.className = "bchip";
-    b.setAttribute("aria-pressed", String(pick === h.id)); b.disabled = other === h.id;
+    b.setAttribute("aria-pressed", String(pick === h.id)); b.disabled = other.includes(h.id);
     const k = document.createElement("span"); k.className = "k"; k.textContent = h.tag;
     const t = document.createElement("span"); t.className = "t"; t.textContent = h.name;
     b.append(k, t); b.onclick = () => { set(pick === h.id ? null : h.id); renderBallot(); };
@@ -927,19 +934,21 @@ function renderBallot() {
   const ids = new Set(places().map(h => h.id));
   if (bFirst && !ids.has(bFirst)) bFirst = null;
   if (bSecond && !ids.has(bSecond)) bSecond = null;
+  if (bThird && !ids.has(bThird)) bThird = null;
   const mine = myBallot();
   if (mine && !bEditing) {
-    const n1 = byId(mine.first)?.name || "?", n2 = byId(mine.second)?.name || "?";
+    const n1 = byId(mine.first)?.name || "?", n2 = byId(mine.second)?.name || "?", n3 = byId(mine.third)?.name || "?";
     $("bForm").hidden = true; $("bOk").hidden = true;
     let done = $("bDone"); if (!done) { done = document.createElement("div"); done.id = "bDone"; done.className = "bok"; $("bForm").after(done); }
-    done.hidden = false; const msg = document.createElement("span"); msg.textContent = `✓ C'est noté, ${mine.name} : 🥇 ${n1}, 🥈 ${n2}`; done.replaceChildren(msg);
+    done.hidden = false; const msg = document.createElement("span"); msg.textContent = `✓ C'est noté, ${mine.name} : 🥇 ${n1}, 🥈 ${n2}, 🥉 ${n3}`; done.replaceChildren(msg);
     const ch = document.createElement("button"); ch.type = "button"; ch.className = "btn ghost bedit"; ch.textContent = "Modifier mon vote";
-    ch.onclick = () => { bEditing = true; bFirst = mine.first; bSecond = mine.second; renderBallot(); };
+    ch.onclick = () => { bEditing = true; bFirst = mine.first; bSecond = mine.second; bThird = mine.third || null; renderBallot(); };
     done.append(ch);
   } else {
     $("bForm").hidden = false; const done = $("bDone"); if (done) done.hidden = true;
-    chips($("bFirst"), bFirst, bSecond, v => bFirst = v);
-    chips($("bSecond"), bSecond, bFirst, v => bSecond = v);
+    chips($("bFirst"), bFirst, [bSecond, bThird], v => bFirst = v);
+    chips($("bSecond"), bSecond, [bFirst, bThird], v => bSecond = v);
+    chips($("bThird"), bThird, [bFirst, bSecond], v => bThird = v);
     if (!$("bName").value && myName) $("bName").value = myName;
   }
   const list = ballots(), vb = $("bVoters"); vb.replaceChildren();
@@ -951,13 +960,13 @@ function renderBallot() {
   const res = $("bRes");
   if (isOwner && list.length) {
     res.hidden = false; res.replaceChildren();
-    const sc = new Map(places().map(h => [h.id, { h, pts: 0, f: 0, s: 0 }]));
-    list.forEach(x => { const a = sc.get(x.first), c = sc.get(x.second); if (a) { a.pts += 2; a.f++; } if (c) { c.pts += 1; c.s++; } });
-    const adm = document.createElement("div"); adm.className = "adm"; adm.textContent = "Visible uniquement en mode admin · 2 points pour un 1er choix, 1 point pour un 2e";
+    const sc = new Map(places().map(h => [h.id, { h, pts: 0, f: 0, s: 0, t: 0 }]));
+    list.forEach(x => { const a = sc.get(x.first), c = sc.get(x.second), d = sc.get(x.third); if (a) { a.pts += 3; a.f++; } if (c) { c.pts += 2; c.s++; } if (d) { d.pts += 1; d.t++; } });
+    const adm = document.createElement("div"); adm.className = "adm"; adm.textContent = "Visible uniquement en mode admin · 3 pts pour un 1er choix, 2 pour un 2e, 1 pour un 3e";
     res.append(adm);
-    [...sc.values()].sort((a, b) => b.pts - a.pts || b.f - a.f).forEach(o => {
+    [...sc.values()].sort((a, b) => b.pts - a.pts || b.f - a.f || b.s - a.s).forEach(o => {
       const r = document.createElement("div"); r.className = "row";
-      const n = document.createElement("span"); n.textContent = `${o.h.tag} · ${o.h.name} (${o.f}× 1er, ${o.s}× 2e)`;
+      const n = document.createElement("span"); n.textContent = `${o.h.tag} · ${o.h.name} (${o.f}× 1er, ${o.s}× 2e, ${o.t}× 3e)`;
       const p = document.createElement("b"); p.textContent = o.pts + " pts";
       r.append(n, p); res.append(r);
     });
@@ -968,11 +977,12 @@ $("bForm").onsubmit = async ev => {
   const name = $("bName").value.trim();
   if (!bFirst) return showErr("Choisis ta maison préférée.", "bErr");
   if (!bSecond) return showErr("Choisis aussi ton deuxième choix.", "bErr");
+  if (!bThird) return showErr("Choisis aussi ton troisième choix.", "bErr");
   if (!name) { showErr("Ajoute ton prénom pour valider.", "bErr"); $("bName").focus(); return; }
   if (name !== myName) saveName(name);
   $("bSend").disabled = true;
   try {
-    await db.collection("votes").doc("ballot-" + voterKey).set({ name, first: bFirst, second: bSecond, at: new Date().toISOString() });
+    await db.collection("votes").doc(BP + voterKey).set({ name, first: bFirst, second: bSecond, third: bThird, at: new Date().toISOString() });
     bEditing = false;
   } catch (e) { writeErr(e, "bErr"); }
   finally { $("bSend").disabled = false; }
