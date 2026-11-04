@@ -958,11 +958,11 @@ function renderBallot() {
   vb.append(head);
   if (list.length) { const ns = document.createElement("div"); ns.className = "names"; list.forEach(x => { const sp = document.createElement("span"); sp.textContent = x.name; ns.append(sp); }); vb.append(ns); }
   const res = $("bRes");
-  if (isOwner && list.length) {
+  if (isOwner) {
     res.hidden = false; res.replaceChildren();
     const sc = new Map(places().map(h => [h.id, { h, pts: 0, f: 0, s: 0, t: 0 }]));
     list.forEach(x => { const a = sc.get(x.first), c = sc.get(x.second), d = sc.get(x.third); if (a) { a.pts += 3; a.f++; } if (c) { c.pts += 2; c.s++; } if (d) { d.pts += 1; d.t++; } });
-    const adm = document.createElement("div"); adm.className = "adm"; adm.textContent = "Visible uniquement en mode admin · 3 pts pour un 1er choix, 2 pour un 2e, 1 pour un 3e";
+    const adm = document.createElement("div"); adm.className = "adm"; adm.textContent = "Visible uniquement en mode admin · Nouveau tour à 3 choix : 3 pts pour un 1er choix, 2 pour un 2e, 1 pour un 3e" + (list.length ? "" : " · aucun vote pour l'instant (les votes du tour précédent sont archivés)");
     res.append(adm);
     [...sc.values()].sort((a, b) => b.pts - a.pts || b.f - a.f || b.s - a.s).forEach(o => {
       const r = document.createElement("div"); r.className = "row";
