@@ -109,6 +109,18 @@ h1 .dot { color: var(--colza); }
 .bvoters b { color: var(--fg); }
 .bvoters .names { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
 .bvoters .names span { background: var(--bg); color: var(--fg); border-radius: 999px; padding: 3px 10px; font-size: 13px; }
+.results .bhead p b { color: var(--fg); }
+.rtable { overflow-x: auto; }
+.rtable table { width: 100%; border-collapse: collapse; font-size: 14.5px; }
+.rtable th { text-align: left; font-size: 12.5px; font-weight: 600; color: var(--muted); padding: 0 8px 8px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+.rtable td { padding: 10px 8px; border-bottom: 1px solid var(--line); }
+.rtable .n { text-align: right; font-variant-numeric: tabular-nums; }
+.rtable td .k { display: inline-grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: var(--bg); font-size: 12px; font-weight: 700; margin-right: 8px; }
+.rtable tr.win td { background: var(--accent-soft); font-weight: 600; }
+.rtable tr.win .k { background: var(--accent); color: var(--accent-fg); }
+.rnote { margin: 0; font-size: 13px; color: var(--muted); }
+.rmore { margin: 28px 0 -8px; font-size: 14px; color: var(--muted); }
+.ballot[hidden] { display: none; }
 .bres { border-top: 1px solid var(--line); padding-top: 12px; display: grid; gap: 6px; font-size: 14px; }
 .bres .row { display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 10px; }
 .bres .row b { font-variant-numeric: tabular-nums; }
@@ -269,15 +281,34 @@ textarea:focus-visible, input:focus-visible, button:focus-visible, a:focus-visib
 <div class="wrap">
   <header>
     <div class="eyebrow">15 → 18 avril 2027 · 14 personnes · 3 nuits</div>
-    <h1>OGP Trip<span class="dot">.</span> On dort où&nbsp;?</h1>
+    <h1>OGP Trip<span class="dot">.</span> On dort dans le Vexin&nbsp;!</h1>
   </header>
 
-  <section class="ballot" id="ballot" aria-labelledby="bH">
+  <section class="ballot results" aria-labelledby="rH">
+    <div class="bhead">
+      <h2 id="rH">Résultat du vote final</h2>
+      <p>On dort à <b>La Belle Vie du Vexin</b>. 🏡</p>
+    </div>
+    <div class="rtable">
+      <table>
+        <thead><tr><th>Maison</th><th class="n">Points</th><th class="n">🥇 1er</th><th class="n">🥈 2e</th><th class="n">🥉 3e</th></tr></thead>
+        <tbody>
+          <tr class="win"><td><span class="k">4</span>La Belle Vie du Vexin</td><td class="n"><b>31</b></td><td class="n">7</td><td class="n">4</td><td class="n">2</td></tr>
+          <tr><td><span class="k">2</span>Villa Padelstay</td><td class="n"><b>26</b></td><td class="n">5</td><td class="n">2</td><td class="n">7</td></tr>
+          <tr><td><span class="k">3</span>Le Domaine de Flancourt</td><td class="n"><b>19</b></td><td class="n">0</td><td class="n">8</td><td class="n">3</td></tr>
+          <tr><td><span class="k">1</span>La Chapelle-sur-Dun</td><td class="n"><b>8</b></td><td class="n">2</td><td class="n">0</td><td class="n">2</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="rnote">1er choix = 3 pts, 2e = 2 pts, 3e = 1 pt. Votes d'Antoine et de Marine comptés double.</p>
+  </section>
+  <p class="rmore">Les 4 maisons, pour mémoire :</p>
+
+  <section class="ballot" id="ballot" aria-labelledby="bH" hidden>
     <div class="bhead">
       <h2 id="bH">Vote final</h2>
       <p>Nouveau tour : classe tes 3 maisons préférées. Les votes précédents ne comptent plus. Les résultats restent cachés jusqu'à la fin du vote.</p>
     </div>
-    <div class="fab"><img src="img/fabien.jpg" alt="Fabien, tout sourire dans un hamac"><p><b>Vous pensiez en avoir fini&nbsp;?</b>Fabien, lui, non. Il ajoute la maison n°4.</p></div>
     <form id="bForm" novalidate>
       <fieldset class="brow"><legend>🥇 Mon premier choix</legend><div class="bchips" id="bFirst"></div></fieldset>
       <fieldset class="brow"><legend>🥈 Mon deuxième choix</legend><div class="bchips" id="bSecond"></div></fieldset>
